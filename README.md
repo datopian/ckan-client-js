@@ -5,6 +5,16 @@
 - [Node](https://nodejs.org/en/)
 - [NPM Package Manager](https://www.npmjs.com/)
 
+## Built with
+
+- [commander](https://github.com/tj/commander.js/)
+- [crypto-js](https://cryptojs.gitbook.io/docs/)
+- [form-data](https://github.com/form-data/form-data)
+- [axios](https://github.com/axios/axios)
+- [mocha](https://mochajs.org/)
+- [chai](https://www.chaijs.com/)
+- [nock](https://github.com/nock/nock)
+
 ## Install
 
 First, clone the repo via git:
@@ -17,16 +27,51 @@ And then install dependencies with npm.
 
 ```bash
 $ cd ckan3-js-sdk
-$ npm install
 ```
 
+```bash
+$ npm install -g
+```
+
+It will create a directory called `ckan3-js-sdk`.<br>
+Inside that directory, it will generate the initial project structure.
+
+```bash
+ckan3-js-sdk
+├── bin
+│   └── index.js
+├── lib
+│   ├── create-hash.js
+│   └── get-headers.js
+├── License
+├── mock
+│   └── file.csv
+├── package.json
+├── package-lock.json
+├── README.md
+└── tests
+    └── test.js
+```
+
+## Upload
+
+Upload a file with API key argument
+
+| 1st Argument       |     2nd Argument      | 3rd Argument |
+| ------------------ | :-------------------: | :----------: |
+| upload-to-new-ckan | --apikey=your-api-key |  file path   |
+
+**eg:**
+
+```bash
+$ upload-to-new-ckan --apikey=XXXZZZYYY mock/file.csv
+```
 
 ## Tests
 
 ```bash
 $ npm test
 ```
-
 
 ## License
 
