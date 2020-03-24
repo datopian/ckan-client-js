@@ -7,7 +7,6 @@
 
 ## Built with
 
-- [commander](https://github.com/tj/commander.js/)
 - [crypto-js](https://cryptojs.gitbook.io/docs/)
 - [form-data](https://github.com/form-data/form-data)
 - [axios](https://github.com/axios/axios)
@@ -30,7 +29,7 @@ $ cd ckan3-js-sdk
 ```
 
 ```bash
-$ npm install -g
+$ npm install
 ```
 
 It will create a directory called `ckan3-js-sdk`.<br>
@@ -51,20 +50,6 @@ ckan3-js-sdk
 ├── README.md
 └── tests
     └── test.js
-```
-
-## Upload
-
-Upload a file with API key argument
-
-| 1st Argument       |     2nd Argument      | 3rd Argument |
-| ------------------ | :-------------------: | :----------: |
-| upload-to-new-ckan | --apikey=your-api-key |  file path   |
-
-**eg:**
-
-```bash
-$ upload-to-new-ckan --apikey=XXXZZZYYY mock/file.csv
 ```
 
 ## Tests
