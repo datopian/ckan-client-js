@@ -44,7 +44,7 @@ describe('Upload', function() {
   })
 
   describe('# Upload file', () => {
-    it('should return - 200 - OK', async () => {
+    it('should return status code 200 and an object', async () => {
       nock(NOCK_API_URL)
         .put(NOCK_API_PATH)
         .reply(200, {})
@@ -59,7 +59,7 @@ describe('Upload', function() {
 
 describe('Git lfs server request', () => {
   describe('# OK - 200', () => {
-    it('should return a object', async () => {
+    it('should return status code 200 and an object', async () => {
       nock(NOCK_API_URL)
         .get(NOCK_API_PATH)
         .reply(200, {
@@ -94,7 +94,7 @@ describe('Git lfs server request', () => {
   })
 
   describe('# Not Found - 404', () => {
-    it('should return a object', async () => {
+    it('should return status code 404 and an object', async () => {
       nock(NOCK_API_URL)
         .get(NOCK_API_PATH)
         .replyWithError({
@@ -111,7 +111,7 @@ describe('Git lfs server request', () => {
   })
 
   describe('# Unauthorized - 401', () => {
-    it('should return a object', async () => {
+    it('should return status code 401 and an object', async () => {
       nock(NOCK_API_URL)
         .get(NOCK_API_PATH)
         .replyWithError({
@@ -131,41 +131,61 @@ describe('Git lfs server request', () => {
 
 describe('Ckan authz request', () => {
   describe('# OK - 200', () => {
-    it('should return a object', () => {
-      const scope = nock(NOCK_API_URL)
+    it('should return status code equal 200 and an object', async () => {
+      nock(NOCK_API_URL)
         .get(NOCK_API_PATH)
         .reply(200, {
           success: true,
           msg: 'Authorized',
         })
 
-      expect(typeof scope).to.equal('object')
+      const result = await axios(`${NOCK_API_URL}${NOCK_API_PATH}`).catch(
+        error => error
+      )
+
+      expect(result.status).to.equal(200)
+      expect(typeof result.data).to.equal('object')
+      expect(result.data).to.deep.equal({ success: true, msg: 'Authorized' })
     })
   })
 
   describe('# Not Found - 404', () => {
-    it('should return a object', () => {
-      const scope = nock(NOCK_API_URL)
+    it('should return status code 404 and a message', async () => {
+      nock(NOCK_API_URL)
         .get(NOCK_API_PATH)
-        .reply(404, {
+        .replyWithError({
+          code: 404,
           success: false,
           msg: 'Not found',
         })
 
-      expect(typeof scope).to.equal('object')
+      const result = await axios(`${NOCK_API_URL}${NOCK_API_PATH}`).catch(
+        error => error
+      )
+
+      expect(result.code).to.deep.equal(404)
+      expect(result.success).to.equal(false)
+      expect(result.msg).to.deep.equal('Not found')
     })
   })
 
   describe('# Unauthorized - 401', () => {
-    it('should return a object', () => {
-      const scope = nock(NOCK_API_URL)
+    it('should return status code 401 and a message', async () => {
+      nock(NOCK_API_URL)
         .get(NOCK_API_PATH)
-        .reply(401, {
+        .replyWithError({
+          code: 401,
           success: false,
           msg: 'Not authorized',
         })
 
-      expect(typeof scope).to.equal('object')
+      const result = await axios(`${NOCK_API_URL}${NOCK_API_PATH}`).catch(
+        error => error
+      )
+
+      expect(result.code).to.deep.equal(401)
+      expect(result.success).to.equal(false)
+      expect(result.msg).to.deep.equal('Not authorized')
     })
   })
 })

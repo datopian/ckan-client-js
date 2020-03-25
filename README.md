@@ -37,25 +37,32 @@ Inside that directory, it will generate the initial project structure.
 
 ```bash
 ckan3-js-sdk
-├── bin
+.
+|── lib
+│   ├── form-data.js
+│   ├── hash.js
+│   ├── headers.js
 │   └── index.js
-├── lib
-│   ├── create-hash.js
-│   └── get-headers.js
 ├── License
 ├── mock
-│   └── file.csv
+│   └── sample.csv
 ├── package.json
 ├── package-lock.json
 ├── README.md
-└── tests
-    └── test.js
+├── tests
+│   └── test.js
 ```
 
 ## Tests
 
 ```bash
 $ npm test
+```
+
+or
+
+```bash
+$ yarn test
 ```
 
 ## License
