@@ -33,6 +33,74 @@ const dpinfo = {
   name: 'datapackage.json'
 }
 
+test('push works with packaged dataset', async t => {
+  const dataset = await Dataset.load('test/fixtures/dp-no-resources')
+  const options = {findability: 'unlisted'}
+  await datahub.push(dataset, options)
+
+  t.is(rawstoreAuthorize.isDone(), true) // = authz on giftless
+  // t.is(rawstoreStorageMock.isDone(), true) // = upload to storage
+  // t.is(apiSpecStore.isDone(), true) //  metastore
+  // this does 2 mocks (the very first and nearly the last) and hence is called last rather than
+  // t.is(authorizeForServices.isDone(), true) // = authz on ckan
+
+  // TODO: make sure we have not altered the dataset.resources object in any way
+  t.is(dataset.resources.length, 0)
+})
+
+// ---------
+// Mocks
+//
+// TODO: (maybe) move this out to a separate file
+
+const rawstoreUrl = 'https://s3-us-west-2.amazonaws.com'
+
+const authorizeForServices = nock(config.api, {reqheaders: {'Auth-Token': 't35tt0k3N'}})
+  .persist()
+  .get('/auth/authorize?service=rawstore')
+  .reply(200, {
+    permissions: {},
+    service: 'test',
+    token: 'authz.token',
+    userid: 'testid'
+  })
+  .get('/auth/authorize?service=source')
+  .reply(200, {
+    permissions: {},
+    service: 'test',
+    token: 'authz.token',
+    userid: 'testid'
+  })
+
+const rawstoreAuthorize = nock(config.api, {reqheaders: {'Auth-Token': 'authz.token'}})
+  .persist()
+  .post('/rawstore/authorize', {
+    metadata: {
+      owner: config.profile.id,
+      findability: 'unlisted'
+    },
+    filedata: {'datapackage.json': dpinfo}
+  })
+  .reply(200, {
+    filedata: {
+      'datapackage.json': {
+        md5: dpinfo.md5,
+        length: 85,
+        name: 'datapackage.json',
+        type: 'application/json',
+        // eslint-disable-next-line camelcase
+        upload_query: {
+          key: dpinfo.md5,
+          policy: '...',
+          'x-amz-algorithm': 'AWS4-HMAC-SHA256',
+          'x-amz-credential': 'XXX',
+          'x-amz-signature': 'YYY'
+        },
+        // eslint-disable-next-line camelcase
+        upload_url: rawstoreUrl
+      }
+    }
+  })
 
 /*
 const finVixInfo = {
@@ -78,8 +146,6 @@ const encodedInfo = {
     "name":"datapackage.json"
   }
 }
-
-const rawstoreUrl = 'https://s3-us-west-2.amazonaws.com'
 
 const flowPushNock = nock('http://testing.com')
   .persist()
@@ -149,53 +215,6 @@ const rawstoreAuthorizeEncoding = nock(config.api, {reqheaders: {'Auth-Token': '
         // eslint-disable-next-line camelcase
         upload_query: {
           key: encodedInfo['datapackage.json'].md5,
-          policy: '...',
-          'x-amz-algorithm': 'AWS4-HMAC-SHA256',
-          'x-amz-credential': 'XXX',
-          'x-amz-signature': 'YYY'
-        },
-        // eslint-disable-next-line camelcase
-        upload_url: rawstoreUrl
-      }
-    }
-  })
-
-const authorizeForServices = nock(config.api, {reqheaders: {'Auth-Token': 't35tt0k3N'}})
-  .persist()
-  .get('/auth/authorize?service=rawstore')
-  .reply(200, {
-    permissions: {},
-    service: 'test',
-    token: 'authz.token',
-    userid: 'testid'
-  })
-  .get('/auth/authorize?service=source')
-  .reply(200, {
-    permissions: {},
-    service: 'test',
-    token: 'authz.token',
-    userid: 'testid'
-  })
-
-const rawstoreAuthorize = nock(config.api, {reqheaders: {'Auth-Token': 'authz.token'}})
-  .persist()
-  .post('/rawstore/authorize', {
-    metadata: {
-      owner: config.profile.id,
-      findability: 'unlisted'
-    },
-    filedata: {'datapackage.json': dpinfo}
-  })
-  .reply(200, {
-    filedata: {
-      'datapackage.json': {
-        md5: dpinfo.md5,
-        length: 85,
-        name: 'datapackage.json',
-        type: 'application/json',
-        // eslint-disable-next-line camelcase
-        upload_query: {
-          key: dpinfo.md5,
           policy: '...',
           'x-amz-algorithm': 'AWS4-HMAC-SHA256',
           'x-amz-credential': 'XXX',

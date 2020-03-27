@@ -14,7 +14,8 @@ const FILE_NAME = 'sample.csv'
 const NOCK_API_URL = 'http://localhost:3001'
 const NOCK_API_PATH = '/upload-csv'
 
-describe('Upload', function() {
+
+describe('Upload File to Storage and Update MetaStore', function() {
   const ckan = new Upload(API_KEY, PATH_OF_THE_FILE, FILE_NAME, API_UPLOAD_PATH)
 
   before(function() {
@@ -23,6 +24,32 @@ describe('Upload', function() {
 
   afterEach(function() {
     nock.cleanAll()
+  })
+
+  // the idea of this test is ...
+  //
+  // to test the upload flow which is multi-step and involves interacting with several external services (~4)
+  // we will have mocked out each of these services and then test that the upload flow has correctly called each of these services in turn
+  // you can see a diagram of this flow here ... insert link (preferably in an issue - not scratch hackmd and that may disappear)
+  // finally, we will test the return value of the function
+  //
+  // 0. has an api token (assumed to have this to start with ...)
+  // 1. gets token authenticates with ckan authz
+  // 2. gets token ckan storage token access issuer (git lfs)
+  // 3. upload file(s) to storage using the token and relevant headers
+    // file*s* test is for the future
+  // 4. [update ckan metastore with the uploaded file info ... (as appropriate)]
+  describe('Upload file', () => {
+    it('should return status code 200 and an object', async () => {
+      nock(NOCK_API_URL)
+        .put(NOCK_API_PATH)
+        .reply(200, {})
+
+      const result = await ckan.push()
+
+      expect(typeof result.data).to.equal('object')
+      expect(result.status).to.equal(200)
+    })
   })
 
   describe('# Get headers', () => {
@@ -43,18 +70,6 @@ describe('Upload', function() {
     })
   })
 
-  describe('# Upload file', () => {
-    it('should return status code 200 and an object', async () => {
-      nock(NOCK_API_URL)
-        .put(NOCK_API_PATH)
-        .reply(200, {})
-
-      const result = await ckan.push()
-
-      expect(typeof result.data).to.equal('object')
-      expect(result.status).to.equal(200)
-    })
-  })
 })
 
 describe('Git lfs server request', () => {
