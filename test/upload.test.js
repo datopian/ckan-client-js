@@ -1,7 +1,8 @@
 const test = require('ava')
 const nock = require('nock')
 
-const { Upload } = require('../lib/index')
+const { DataHub } = require('../lib/index')
+const { Dataset, File } = require('data.js')
 
 /**
  * Push stuff
@@ -13,12 +14,22 @@ const config = {
     id: 'test-userid',
     username: 'test-username',
   },
+  ckanAuthzBody: {
+    scope: ['res:my_resource_id:create'],
+    lifetime: 5000,
+  },
+  accessGranterApi: 'https://git-server.com',
+  accessGranterBody: {
+    oid: '1111111',
+    size: 123,
+    hash: 'JWT-Token',
+  },
 }
 
 /**
  * Instance of the Upload class
  */
-const datahub = new Upload(
+const datahub = new DataHub(
   config.token,
   config.profile.id,
   config.profile.username,
@@ -26,149 +37,108 @@ const datahub = new Upload(
 )
 
 /**
+ * Mock
+ */
+const ckanAuthzMock = nock(config.api)
+  .persist()
+  .post('/api/3/action/authz_authorize', config.ckanAuthzBody)
+  .reply(200, {
+    help: 'http://ckan:5000/api/3/action/help_show?name=authz_authorize',
+    success: true,
+    result: {
+      requested_scopes: ['org:*:read'],
+      granted_scopes: [],
+      token: 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZXMi===',
+      user_id: 'ckan_admin',
+      expires_at: '2020-03-27T19:01:15.714553+00:00',
+    },
+  })
+
+const mainAuthzMock_forCloudStorageAccessGranterServiceMock = nock(
+  config.accessGranterApi
+)
+  .persist()
+  .filteringRequestBody(body => config.accessGranterBody)
+  .post('/any-path', config.accessGranterBody)
+  .reply(200, {
+    transfer: 'basic',
+    objects: [
+      {
+        oid: '1111111',
+        size: 123,
+        authenticated: true,
+        actions: {
+          upload: {
+            href: 'https://some-upload.com/1111111',
+            header: {
+              Authorization: 'Basic ...',
+            },
+            expires_in: 86400,
+          },
+          verify: {
+            href: 'https://some-verify-callback.com',
+            header: {
+              Authorization: 'Basic ...',
+            },
+            expires_in: 86400,
+          },
+        },
+      },
+    ],
+  })
+
+const cloudStorageMock = nock(
+  'https://myaccount.blob.core.windows.net/mycontainer/',
+  {
+    reqheaders: {
+      'x-ms-version': '2015-02-21 ',
+      'x-ms-date': '2015-02-21',
+      'Content-Type': 'text/plain; charset=UTF-8',
+      'x-ms-blob-content-disposition': "attachment; filename='fname.ext'",
+      'x-ms-blob-type': 'BlockBlob',
+      'x-ms-meta-m1': 'v1 ',
+      'x-ms-meta-m2': 'v2',
+      Authorization:
+        'SharedKey myaccount:YhuFJjN4fAR8/AmBrqBz7MG2uFinQ4rkh4dscbj598g= ',
+      'Content-Length': 11,
+    },
+  }
+)
+  .persist()
+  .put('/my-blob', {})
+  .reply(200, {}, {
+    'Transfer-Encoding': 'chunked',
+    'Content-MD5': 'sQqNsWTgdUEFt6mb5y4/5Q==',
+    'x-ms-content-crc64': '77uWZTolTHU',
+    Date: '2015-02-21',
+    ETag: '0x8CB171BA9E94B0B',
+    'Last-Modified': '2015-02-21',
+    'Access-Control-Allow-Origin': 'http://contoso.com',
+    'Access-Control-Expose-Headers': 'Content-MD5',
+    'Access-Control-Allow-Credentials': true,
+    Server: 'Windows-Azure-Blob/1.0 Microsoft-HTTPAPI/2.0',
+  })
+
+/**
  * Start test
  */
-test('should return JWT token from ckanAuthz', async t => {
-  const body = {
-    scope: ['res:my_resource_id:create'],
-    lifetime: 5000,
-  }
-  const ckanAuthzScope = nock(config.api)
-    .persist()
-    .post('/api/3/action/authz_authorize', body)
-    .reply(200, {
-      help: 'http://ckan:5000/api/3/action/help_show?name=authz_authorize',
-      success: true,
-      result: {
-        requested_scopes: ['org:*:read'],
-        granted_scopes: [],
-        token:
-          'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZXMiOiIiLCJuYW1lIjpudWxsLCJpc3MiOiJodHRwOi8vY2thbjo1MDAwIiwiZXhwIjoxNTg1MzM1Njc1LCJuYmYiOjE1ODUzMzQ3NzUsInN1YiI6ImNrYW5fYWRtaW4ifQ.V_Ubtrg8fC4weVCEoBKNmanRQRz_9Z3pJwHY_st_VEPAvWr4V6xI6QHQoCLKPzJ9yTc1tAOCexH_gcAyGvbGWCdHndc4rsBRRNo85e9JmdOW_2NYpnvc1pI64QGxar9Rda_IQbmLJAqaWNplKwYiRaN7bKf18Wq7KyjuvA-YlAntDTUl0Qy8ekzrnezkJDIQJJ0PVEbOZkvYppk6-2QqutiFrVcF_dR26oxl6k49Gcl07sIMgTMi5D4RTEEploLXYSXsZhz5JVHKD5_dsqAF1boCd8HuMY8_kNpJ11uMij5ZBXZpIHw8bKLE4fdrDIu3u03MUplw1TvTZQox-_1vraBfnc_RBejKJ6ZlNrdXnAZThLtt0t3FNy1bAC-rLrKikfTsUNyBtNVcgLzTn-KLE42BbHXIM406Rnn3rQR1flcUnb0qOvPPCuyK02b9SGvZXuUTemsrFIg4vqXwISmXhZgX4a6vki_u9-pPap9teJsRih4dNo1kbb3Iam2WKMxADSjr5qINd8YSAVNuI5qwoCSLCXM_TcWi6zni5cV2GbxPZ8SNNEfLQ-FVcI9WHd-2Tj1f06bNor9PI-ySf8FXjh8UG9n8EUIQHjfW_Hm8UIDCUfFjx0f6rKAK7BN3r_vPol_bKMyoG_s7W0t3Q5OfXs0tzEduWMn9fkgEV6nNvcA',
-        user_id: 'ckan_admin',
-        expires_at: '2020-03-27T19:01:15.714553+00:00',
-      },
-    })
-
-  await datahub.push(body)
-
-  t.is(ckanAuthzScope.isDone(), true)
+test('Can instantiate DataHub', t => {
+  const datahub = new DataHub(
+    config.token,
+    config.profile.id,
+    config.profile.username,
+    config.api
+  )
+  t.is(datahub.api, config.api)
 })
 
-/*
-test('push works with a single file', async t => {
+test('Push works with packaged dataset', async t => {
   const resource = {
     path: 'test/fixtures/sample.csv',
   }
   await datahub.push(resource)
 
+  t.is(ckanAuthzMock.isDone(), true)
   t.is(mainAuthzMock_forCloudStorageAccessGranterServiceMock.isDone(), true)
-  // t.is(cloudStorageAccessGranterMock.isDone(), true)
-  // t.is(storageMock.isDone(), true)
-  // t.is(metastoreMock.isDone(), true)
+  // t.is(cloudStorageMock.isDone(), true)
 })
-
-const authzToekn = 'abc'
-
-const mainAuthzMock_forCloudStorageAccessGranterServiceMock = nock(config.api)
-  .persist()
-  .post('/api/3/action/authz_authorize', body)
-  .reply(200, {
-    token: authzToekn,
-    user_id: 'user_name',
-    expires_at: '20200326T170624Z',
-    requested_scopes: ['res:my_resource_id:create'],
-    granted_scopes: ['res:my_resource_id:create'],
-  })
-
-const gitLFSScope = nock('https://git-server.com')
-  .persist()
-  // authzToken shows up here ...
-  .post('/any-path', body) // this body is crucial - it should include info from authz
-  .reply(200, {
-    results: {
-      transfer: 'basic',
-      objects: [
-        {
-          oid: '1111111',
-          size: 123,
-          authenticated: true,
-          actions: {
-            upload: {
-              href: 'https://some-upload.com/1111111',
-              header: {
-                Authorization: 'Basic ...',
-              },
-              expires_in: 86400,
-            },
-          },
-        },
-      ],
-    },
-  })
-
-
-
-
-
-
-
-
-
-
-
-
-//const storageMock ...
-
-
-
-test('should return blob url from GitLSF server', async t => {
-  const body = {
-    oid: '1111111',
-    size: 123,
-    hash: '',
-  }
-  const gitLFSScope = nock('https://git-server.com')
-    .persist()
-    .post('/any-path', body)
-    .reply(200, {
-      results: {
-        transfer: 'basic',
-        objects: [
-          {
-            oid: '1111111',
-            size: 123,
-            authenticated: true,
-            actions: {
-              upload: {
-                href: 'https://some-upload.com/1111111',
-                header: {
-                  Authorization: 'Basic ...',
-                },
-                expires_in: 86400,
-              },
-            },
-          },
-        ],
-      },
-    })
-
-  await datahub.getBlobUrl(body)
-
-  t.is(gitLFSScope.isDone(), true)
-})
-
-/**
- * Cloud storage
- *
- * S3 or Azure
- *
- * Azure reference: https://docs.microsoft.com/en-us/rest/api/storageservices/put-blob
- * Azure url: https://myaccount.blob.core.windows.net/mycontainer/myblob
- * scope ?
- * response ?
- */
-
-//  const azureScope = nock('https://myaccount.blob.core.windows.net/mycontainer/')
-//     .persist()
-//     .post('/my-blob', body)
-//     .reply(200, {})
