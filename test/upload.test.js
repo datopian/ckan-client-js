@@ -14,16 +14,40 @@ const config = {
     id: 'test-userid',
     username: 'test-username',
   },
-  ckanAuthzBody: {
+}
+
+const ckanAuthzConfig = {
+  body: {
     scope: ['res:my_resource_id:create'],
     lifetime: 5000,
-  },
-  accessGranterApi: 'https://git-server.com',
-  accessGranterBody: {
+  }
+}
+
+const accessGranterConfig = {
+  api: 'https://git-server.com',
+  body: {
     oid: '1111111',
     size: 123,
     hash: 'JWT-Token',
   },
+  headers:  {
+    Authorization: 'Bearer TOKEN',
+  }
+}
+
+const cloudStorageConfig = {
+  api: 'https://myaccount.blob.core.windows.net/mycontainer/',
+  path: '/my-blob',
+  body: {
+    meta: {
+      version: 1,
+      ownerid: 'test-userid',
+      owner: 'test-username',
+      dataset: 'iso',
+      findability: 'unlisted',
+    },
+    inputs: [],
+  }
 }
 
 /**
@@ -41,7 +65,7 @@ const datahub = new DataHub(
  */
 const ckanAuthzMock = nock(config.api)
   .persist()
-  .post('/api/3/action/authz_authorize', config.ckanAuthzBody)
+  .post('/api/3/action/authz_authorize', ckanAuthzConfig.body)
   .reply(200, {
     help: 'http://ckan:5000/api/3/action/help_show?name=authz_authorize',
     success: true,
@@ -55,11 +79,11 @@ const ckanAuthzMock = nock(config.api)
   })
 
 const mainAuthzMock_forCloudStorageAccessGranterServiceMock = nock(
-  config.accessGranterApi
+  accessGranterConfig.api
 )
   .persist()
-  .filteringRequestBody(body => config.accessGranterBody)
-  .post('/any-path', config.accessGranterBody)
+  .filteringRequestBody(body => accessGranterConfig.body)
+  .post('/any-path', accessGranterConfig.body)
   .reply(200, {
     transfer: 'basic',
     objects: [
@@ -69,16 +93,14 @@ const mainAuthzMock_forCloudStorageAccessGranterServiceMock = nock(
         authenticated: true,
         actions: {
           upload: {
-            href: 'https://some-upload.com/1111111',
-            header: {
-              Authorization: 'Basic ...',
-            },
+            href: 'https://myaccount.blob.core.windows.net/mycontainer/my-blob',
+            header: accessGranterConfig.headers,
             expires_in: 86400,
           },
           verify: {
             href: 'https://some-verify-callback.com',
             header: {
-              Authorization: 'Basic ...',
+              Authorization: 'Bearer TOKEN',
             },
             expires_in: 86400,
           },
@@ -87,36 +109,21 @@ const mainAuthzMock_forCloudStorageAccessGranterServiceMock = nock(
     ],
   })
 
-const cloudStorageMock = nock(
-  'https://myaccount.blob.core.windows.net/mycontainer/',
-  {
-    reqheaders: {
-      'x-ms-version': '2015-02-21 ',
-      'x-ms-date': '2015-02-21',
-      'Content-Type': 'text/plain; charset=UTF-8',
-      'x-ms-blob-content-disposition': "attachment; filename='fname.ext'",
-      'x-ms-blob-type': 'BlockBlob',
-      'x-ms-meta-m1': 'v1 ',
-      'x-ms-meta-m2': 'v2',
-      Authorization:
-        'SharedKey myaccount:YhuFJjN4fAR8/AmBrqBz7MG2uFinQ4rkh4dscbj598g= ',
-      'Content-Length': 11,
-    },
-  }
-)
+const cloudStorageMock = nock( cloudStorageConfig.api, { reqheaders: accessGranterConfig.headers })
   .persist()
-  .put('/my-blob', {})
-  .reply(200, {}, {
-    'Transfer-Encoding': 'chunked',
-    'Content-MD5': 'sQqNsWTgdUEFt6mb5y4/5Q==',
-    'x-ms-content-crc64': '77uWZTolTHU',
-    Date: '2015-02-21',
-    ETag: '0x8CB171BA9E94B0B',
-    'Last-Modified': '2015-02-21',
-    'Access-Control-Allow-Origin': 'http://contoso.com',
-    'Access-Control-Expose-Headers': 'Content-MD5',
-    'Access-Control-Allow-Credentials': true,
-    Server: 'Windows-Azure-Blob/1.0 Microsoft-HTTPAPI/2.0',
+  .filteringRequestBody(body => cloudStorageConfig.body)
+  .put(cloudStorageConfig.path, cloudStorageConfig.body)
+  .reply(200, {
+    success: true,
+    id: 'test',
+    errors: [],
+  })
+
+const verifyFileUploadMock = nock('https://some-verify-callback.com')
+  .persist()
+  .get('/')
+  .reply(200, {
+    success: true
   })
 
 /**
@@ -140,5 +147,6 @@ test('Push works with packaged dataset', async t => {
 
   t.is(ckanAuthzMock.isDone(), true)
   t.is(mainAuthzMock_forCloudStorageAccessGranterServiceMock.isDone(), true)
-  // t.is(cloudStorageMock.isDone(), true)
+  t.is(cloudStorageMock.isDone(), true)
+  t.is(verifyFileUploadMock.isDone(), true)
 })
