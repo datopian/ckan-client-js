@@ -1,6 +1,5 @@
 const test = require('ava')
 const nock = require('nock')
-const path = require('path')
 
 const { DataHub } = require('../lib/index')
 const { Dataset, File } = require('data.js')
@@ -20,19 +19,24 @@ const config = {
 
 const ckanAuthzConfig = {
   body: {
-    scope: ['org:*:read'],
-    dataset_id: 'test'
+    scope: ['ds:myorg/mydataset']
   },
 }
 
 const accessGranterConfig = {
-  api: 'https://git-server.com',
   body: {
-    oid: 'hash of the file',
-    size: 123,
+    "operation": "upload",
+    "transfers": [ "basic" ],
+    "ref": { "name": "refs/heads/contrib" },
+    "objects": [
+      {
+        "oid": '8857053d874453bbe8e7613b09874e2d8fc9ddffd2130a579ca918301c31b369',
+        "size": 36
+      }
+    ]
   },
   headers: {
-    Authorization: 'Bearer TOKEN',
+    Authorization: 'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZXMi===',
   },
 }
 
@@ -77,17 +81,17 @@ const ckanAuthzMock = nock(config.api)
       user_id: 'ckan_admin',
       expires_at: '2020-03-27T19:01:15.714553+00:00',
     },
-  })
+  }
+)
 
 const mainAuthzMock_forCloudStorageAccessGranterServiceMock = nock(config.api)
   .persist()
-  .filteringRequestBody(body => accessGranterConfig.body)
   .post('/api/3/action/cloud-storage-access-granter', accessGranterConfig.body)
   .reply(200, {
     transfer: 'basic',
     objects: [
       {
-        oid: '1111111', //TODO: change for the hash of the file
+        oid: '8857053d874453bbe8e7613b09874e2d8fc9ddffd2130a579ca918301c31b369',
         size: 123,
         authenticated: true,
         actions: {
@@ -137,18 +141,10 @@ test('Can instantiate DataHub', t => {
 })
 
 test('Push works with packaged dataset', async t => {
-  const filePath = 'test/fixtures/sample.csv'
-  const scope = ['org:*:read']
-  const pathParts = path.parse(filePath)
-  const file = File.load(pathParts.base, {basePath: pathParts.dir})
-  const metadata = {
-    name: 'this-is-a-test',
-    resources: []
-  }
-  const dataset = await Dataset.load(metadata)
-  dataset.addResource(file)
 
-  await datahub.push(dataset, scope)
+  const dataset = await Dataset.load('test/fixtures/dp-test')
+
+  await datahub.push(dataset, ckanAuthzConfig.body.scope)
 
   t.is(ckanAuthzMock.isDone(), true)
   t.is(mainAuthzMock_forCloudStorageAccessGranterServiceMock.isDone(), true)
