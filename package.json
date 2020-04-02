@@ -28,7 +28,8 @@
     "express": "^4.17.1",
     "form-data": "^3.0.0",
     "node-fetch": "",
-    "url-join": "^4.0.1"
+    "url-join": "^4.0.1",
+    "xlsx": "^0.15.6"
   },
   "devDependencies": {
     "ava": "^3.5.2",

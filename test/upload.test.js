@@ -1,5 +1,6 @@
 const test = require('ava')
 const nock = require('nock')
+const path = require('path')
 
 const { DataHub } = require('../lib/index')
 const { Dataset, File } = require('data.js')
@@ -13,30 +14,30 @@ const config = {
   profile: {
     id: 'test-userid',
     username: 'test-username',
+    unauthorizedScope: ['ds:*:metadata:create'],
   },
 }
 
 const ckanAuthzConfig = {
   body: {
-    scope: ['res:my_resource_id:create'],
-    lifetime: 5000,
-  }
+    scope: ['org:*:read'],
+    dataset_id: 'test'
+  },
 }
 
 const accessGranterConfig = {
   api: 'https://git-server.com',
   body: {
-    oid: '1111111',
+    oid: 'hash of the file',
     size: 123,
-    hash: 'JWT-Token',
   },
-  headers:  {
+  headers: {
     Authorization: 'Bearer TOKEN',
-  }
+  },
 }
 
 const cloudStorageConfig = {
-  api: 'https://myaccount.blob.core.windows.net/mycontainer/',
+  api: 'https://myaccount.blob.core.windows.net/mycontainer',
   path: '/my-blob',
   body: {
     meta: {
@@ -47,7 +48,7 @@ const cloudStorageConfig = {
       findability: 'unlisted',
     },
     inputs: [],
-  }
+  },
 }
 
 /**
@@ -78,17 +79,15 @@ const ckanAuthzMock = nock(config.api)
     },
   })
 
-const mainAuthzMock_forCloudStorageAccessGranterServiceMock = nock(
-  accessGranterConfig.api
-)
+const mainAuthzMock_forCloudStorageAccessGranterServiceMock = nock(config.api)
   .persist()
   .filteringRequestBody(body => accessGranterConfig.body)
-  .post('/any-path', accessGranterConfig.body)
+  .post('/api/3/action/cloud-storage-access-granter', accessGranterConfig.body)
   .reply(200, {
     transfer: 'basic',
     objects: [
       {
-        oid: '1111111',
+        oid: '1111111', //TODO: change for the hash of the file
         size: 123,
         authenticated: true,
         actions: {
@@ -109,21 +108,19 @@ const mainAuthzMock_forCloudStorageAccessGranterServiceMock = nock(
     ],
   })
 
-const cloudStorageMock = nock( cloudStorageConfig.api, { reqheaders: accessGranterConfig.headers })
+const cloudStorageMock = nock(cloudStorageConfig.api, {
+  reqheaders: accessGranterConfig.headers,
+})
   .persist()
   .filteringRequestBody(body => cloudStorageConfig.body)
   .put(cloudStorageConfig.path, cloudStorageConfig.body)
-  .reply(200, {
-    success: true,
-    id: 'test',
-    errors: [],
-  })
+  .reply(201, { success: true }) // The return of the azure is only 201 - ok
 
 const verifyFileUploadMock = nock('https://some-verify-callback.com')
   .persist()
   .get('/')
   .reply(200, {
-    success: true
+    success: true,
   })
 
 /**
@@ -140,10 +137,18 @@ test('Can instantiate DataHub', t => {
 })
 
 test('Push works with packaged dataset', async t => {
-  const resource = {
-    path: 'test/fixtures/sample.csv',
+  const filePath = 'test/fixtures/sample.csv'
+  const scope = ['org:*:read']
+  const pathParts = path.parse(filePath)
+  const file = File.load(pathParts.base, {basePath: pathParts.dir})
+  const metadata = {
+    name: 'this-is-a-test',
+    resources: []
   }
-  await datahub.push(resource)
+  const dataset = await Dataset.load(metadata)
+  dataset.addResource(file)
+
+  await datahub.push(dataset, scope)
 
   t.is(ckanAuthzMock.isDone(), true)
   t.is(mainAuthzMock_forCloudStorageAccessGranterServiceMock.isDone(), true)
