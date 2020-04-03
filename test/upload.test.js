@@ -19,7 +19,7 @@ const config = {
 
 const ckanAuthzConfig = {
   body: {
-    scope: ['ds:myorg/mydataset']
+    scope: ['ds:dataset-organization/dataset-name']
   },
 }
 

@@ -1,4 +1,6 @@
-# ckan3-js-sdk
+# Ckan3-js-sdk
+
+Ckan3-js-sdk is a "SDK" in javascript for uploading files and updating metastore.<br> This SDK will communicate with Ckanext-authz-service, giftless service and uploading to Blob storage.
 
 ## Prerequisites
 
@@ -9,10 +11,10 @@
 
 - [crypto-js](https://cryptojs.gitbook.io/docs/)
 - [form-data](https://github.com/form-data/form-data)
-- [axios](https://github.com/axios/axios)
-- [mocha](https://mochajs.org/)
-- [chai](https://www.chaijs.com/)
+- [node-fetch](https://www.npmjs.com/package/node-fetch)
+- [ava](https://github.com/avajs/ava)
 - [nock](https://github.com/nock/nock)
+- [data.js](https://www.npmjs.com/package/data.js)
 
 ## Install
 
@@ -38,19 +40,30 @@ Inside that directory, it will generate the initial project structure.
 ```bash
 ckan3-js-sdk
 .
-|── lib
+├── lib
+│   ├── datahub.js
 │   ├── form-data.js
 │   ├── hash.js
 │   ├── headers.js
-│   └── index.js
+│   ├── index.js
+│   └── util
+│       ├── agent.js
+│       └── ckan-upload-api.js
 ├── License
-├── mock
-│   └── sample.csv
 ├── package.json
 ├── package-lock.json
 ├── README.md
-├── tests
-│   └── test.js
+└── test
+   ├── datahub.test.js
+   ├── fixtures
+   │   ├── dp-test
+   │   │   ├── datapackage.json
+   │   │   ├── second-resource.csv
+   │   │   └── second-resource-non-tabular.json
+   │   └── sample.csv
+   ├── push.test.js
+   ├── test.js
+   └── upload.test.js
 ```
 
 ## Tests
