@@ -75,8 +75,8 @@ const ckanAuthzMock = nock(config.api)
     help: 'http://ckan:5000/api/3/action/help_show?name=authz_authorize',
     success: true,
     result: {
-      requested_scopes: ['org:*:read'],
-      granted_scopes: [],
+      requested_scopes: ckanAuthzConfig.body.scope,
+      granted_scopes: ckanAuthzConfig.body.scope,
       token: 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZXMi===',
       user_id: 'ckan_admin',
       expires_at: '2020-03-27T19:01:15.714553+00:00',
@@ -86,7 +86,7 @@ const ckanAuthzMock = nock(config.api)
 
 const mainAuthzMock_forCloudStorageAccessGranterServiceMock = nock(config.api)
   .persist()
-  .post('/api/3/action/cloud-storage-access-granter', accessGranterConfig.body)
+  .post('/api/3/action/dataset-organization/dataset-name.git/info/lfs/objects/batch', accessGranterConfig.body)
   .reply(200, {
     transfer: 'basic',
     objects: [
