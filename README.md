@@ -51,7 +51,6 @@ ckan3-js-sdk
 │       └── ckan-upload-api.js
 ├── License
 ├── package.json
-├── package-lock.json
 ├── README.md
 └── test
    ├── datahub.test.js
@@ -64,6 +63,25 @@ ckan3-js-sdk
    ├── push.test.js
    ├── test.js
    └── upload.test.js
+```
+
+## Use
+
+Create a new javascript file like the code below.
+
+```bash
+const { DataHub } = require('./lib/index')
+const { Dataset } = require('data.js')
+
+const datahub = new DataHub(
+  token,
+  ownerid,
+  owner,
+  api
+)
+
+//must have datapackage.json in the directory
+Dataset.load('/path/to/directory/').then(dataset => datahub.push(dataset))
 ```
 
 ## Tests
