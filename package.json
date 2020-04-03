@@ -7,7 +7,8 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "ava test/upload.test.js --verbose --watch"
+    "test": "ava test/upload.test.js --verbose",
+    "test:watch": "ava test/upload.test.js --verbose --watch"
   },
   "repository": {
     "type": "git",

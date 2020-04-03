@@ -96,6 +96,12 @@ or
 $ yarn test
 ```
 
+watch the test
+
+```bash
+$ npm run test:watch
+```
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](License) file for details
