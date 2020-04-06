@@ -19,7 +19,7 @@ const config = {
 
 const ckanAuthzConfig = {
   body: {
-    scope: ['ds:dataset-organization/dataset-name']
+    scopes: ['ds:dataset-organization/dataset-name']
   },
 }
 
@@ -86,7 +86,7 @@ const ckanAuthzMock = nock(config.api)
 
 const mainAuthzMock_forCloudStorageAccessGranterServiceMock = nock(config.api)
   .persist()
-  .post('/api/3/action/dataset-organization/dataset-name.git/info/lfs/objects/batch', accessGranterConfig.body)
+  .post('/api/3/action/dataset-organization/dataset-name/objects/batch', accessGranterConfig.body)
   .reply(200, {
     transfer: 'basic',
     objects: [
