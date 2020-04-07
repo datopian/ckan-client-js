@@ -1,10 +1,10 @@
 {
   "name": "ckan3-js-sdk",
   "version": "1.0.0",
-  "description": "## Prerequisites",
+  "description": "Ckan3-js-sdk is a SDK in javascript for uploading files and updating metastore",
   "main": "lib/index.js",
   "directories": {
-    "test": "tests"
+    "test": "test"
   },
   "scripts": {
     "test": "ava test/upload.test.js --verbose",
@@ -14,12 +14,15 @@
     "type": "git",
     "url": "git@gitlab.com:datopian/experiments/ckan3-js-sdk.git"
   },
+  "bugs": {
+    "url": "https://gitlab.com/datopian/experiments/ckan3-js-sdk/-/issues"
+  },
   "keywords": [
     "node",
     "javascript",
     "ckan"
   ],
-  "author": "Mario Antonio do Amaral Rodeghiero",
+  "author": "datopian",
   "license": "MIT",
   "dependencies": {
     "axios": "^0.19.2",
