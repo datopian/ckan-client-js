@@ -2,7 +2,7 @@ const test = require('ava')
 const nock = require('nock')
 
 const { DataHub } = require('../lib/index')
-const { Dataset, File } = require('data.js')
+const { Dataset } = require('data.js')
 
 /**
  * Push stuff
@@ -67,6 +67,7 @@ const datahub = new DataHub(
 
 /**
  * Mock
+ * TODO: (maybe) move this out to a separate file
  */
 const ckanAuthzMock = nock(config.api)
   .persist()
@@ -150,4 +151,7 @@ test('Push works with packaged dataset', async t => {
   t.is(mainAuthzMock_forCloudStorageAccessGranterServiceMock.isDone(), true)
   t.is(cloudStorageMock.isDone(), true)
   t.is(verifyFileUploadMock.isDone(), true)
+
+   // TODO: make sure we have not altered the dataset.resources object in any way
+   //t.is(dataset.resources.length, 0)
 })
