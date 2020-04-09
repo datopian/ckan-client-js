@@ -19,7 +19,7 @@ const config = {
 
 const ckanAuthzConfig = {
   body: {
-    scopes: ['ds:dataset-organization/dataset-name']
+    scopes: ['obj:dataset-organization/dataset-name/*:write']
   },
 }
 
