@@ -41,28 +41,24 @@ Inside that directory, it will generate the initial project structure.
 ckan3-js-sdk
 .
 ├── lib
-│   ├── datahub.js
 │   ├── form-data.js
 │   ├── hash.js
-│   ├── headers.js
 │   ├── index.js
 │   └── util
-│       ├── agent.js
+│       ├── ckan-auth-api.js
 │       └── ckan-upload-api.js
 ├── License
 ├── package.json
 ├── README.md
-└── test
-   ├── datahub.test.js
-   ├── fixtures
-   │   ├── dp-test
-   │   │   ├── datapackage.json
-   │   │   ├── second-resource.csv
-   │   │   └── second-resource-non-tabular.json
-   │   └── sample.csv
-   ├── push.test.js
-   ├── test.js
-   └── upload.test.js
+├── test
+│   ├── fixtures
+│   │   ├── dp-test
+│   │   │   ├── datapackage.json
+│   │   │   ├── second-resource.csv
+│   │   │   └── second-resource-non-tabular.json
+│   │   └── sample.csv
+|   └── upload.test.js
+└── webpack.config.js
 ```
 
 ## Use
@@ -71,17 +67,28 @@ Create a new javascript file like the code below.
 
 ```bash
 const { DataHub } = require('./lib/index')
-const { Dataset } = require('data.js')
 
 const datahub = new DataHub(
-  token,
-  ownerid,
-  owner,
+  authToken,
+  organizationId,
+  datasetId,
   api
 )
 
-//must have datapackage.json in the directory
-Dataset.load('/path/to/directory/').then(dataset => datahub.push(dataset))
+const resources = {
+  basePath: 'test/fixtures',
+  path: 'sample.csv',
+}
+
+await datahub.push(resources)
+```
+
+## Build
+
+This command will create a bundle in `dist`
+
+```
+npm run build
 ```
 
 ## Tests
