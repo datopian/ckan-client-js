@@ -140,7 +140,7 @@ test('Can instantiate DataHub', (t) => {
   t.is(datahub.api, config.api)
 })
 
-test('Push works with packaged dataset', async (t) => {
+test.skip('Push works with packaged dataset', async (t) => {
   const resources = {
     basePath: 'test/fixtures',
     path: 'sample.csv',
