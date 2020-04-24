@@ -1,6 +1,13 @@
+<div style="text-align: center">
+
 # Ckan3-js-sdk
 
+[![pipeline](https://gitlab.com/datopian/experiments/ckan3-js-sdk/badges/master/pipeline.svg)](https://gitlab.com/datopian/experiments/ckan3-js-sdk)
+[![The MIT License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](http://opensource.org/licenses/MIT)
+
 Ckan3-js-sdk is a "SDK" in javascript for uploading files and updating metastore.<br> This SDK will communicate with Ckanext-authz-service, giftless service and uploading to Blob storage.
+
+</div>
 
 ## Prerequisites
 
@@ -10,11 +17,9 @@ Ckan3-js-sdk is a "SDK" in javascript for uploading files and updating metastore
 ## Built with
 
 - [crypto-js](https://cryptojs.gitbook.io/docs/)
-- [form-data](https://github.com/form-data/form-data)
 - [node-fetch](https://www.npmjs.com/package/node-fetch)
 - [ava](https://github.com/avajs/ava)
 - [nock](https://github.com/nock/nock)
-- [data.js](https://www.npmjs.com/package/data.js)
 
 ## Install
 
@@ -52,10 +57,6 @@ ckan3-js-sdk
 ├── README.md
 ├── test
 │   ├── fixtures
-│   │   ├── dp-test
-│   │   │   ├── datapackage.json
-│   │   │   ├── second-resource.csv
-│   │   │   └── second-resource-non-tabular.json
 │   │   └── sample.csv
 |   └── upload.test.js
 └── webpack.config.js
@@ -63,24 +64,28 @@ ckan3-js-sdk
 
 ## Use
 
-Create a new javascript file like the code below.
+Upload file with **NodeJS**
 
 ```bash
-const { DataHub } = require('./lib/index')
+const ckanUploader = require('./lib/index')
 
-const datahub = new DataHub(
-  authToken,
-  organizationId,
-  datasetId,
-  api
+const file = new ckanUploader.FileAPI.NodeFileSystemFile('file.csv')
+
+const uploader = new ckanUploader.DataHub(
+  'key',
+  'organization-name',
+  'dataset-name',
+  'api'
 )
 
-const resources = {
-  basePath: 'test/fixtures',
-  path: 'sample.csv',
-}
-
-await datahub.push(resources)
+uploader.ckanAuthz()
+  .then(response => {
+    const token = response.result.token
+    return uploader.push(file, token)
+  })
+  .then(response => {
+    console.log(response)
+  })
 ```
 
 ## Build

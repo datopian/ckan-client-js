@@ -1,16 +1,16 @@
 const test = require('ava')
 const nock = require('nock')
 
-const { DataHub } = require('../lib/index')
+const ckanUploader = require('../lib/index')
 
 /**
  * Push stuff
  */
 const config = {
-  authToken: 'b70e2e12-f885-40d9-a297-f823651b111c',
-  api: 'http://localhost:5000',
-  organizationId: 'n373je77u-37376-374n877',
-  datasetId: '63834bffdhf-3743ndhea-e4362',
+  authToken: 'be270cae-1c77-4853-b8c1-30b6cf5e9878',
+  api: 'http://127.0.0.1',
+  organizationId: 'myorg',
+  datasetId: 'dataset-name',
 }
 
 const ckanAuthzConfig = {
@@ -32,6 +32,8 @@ const accessGranterConfig = {
     ],
   },
   headers: {
+    Accept: 'application/vnd.git-lfs+json',
+    "Content-Type": 'application/vnd.git-lfs+json',
     Authorization:
       'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZXMi===',
   },
@@ -40,51 +42,44 @@ const accessGranterConfig = {
 const cloudStorageConfig = {
   api: 'https://myaccount.blob.core.windows.net/mycontainer',
   path: '/my-blob',
-  body: {
-    meta: {
-      version: 1,
-      ownerid: 'test-userid',
-      owner: 'test-username',
-      dataset: 'iso',
-      findability: 'unlisted',
-    },
-    inputs: [],
-  },
+  body: {},
 }
 
 /**
  * Instance of the Upload class
  */
-const datahub = new DataHub(
+const uploader = new ckanUploader.DataHub(
   config.authToken,
   config.organizationId,
   config.datasetId,
   config.api
 )
+const file = new ckanUploader.FileAPI.NodeFileSystemFile('./test/fixtures/sample.csv')
 
 /**
  * Mock
- * TODO: (maybe) move this out to a separate file
  */
 const ckanAuthzMock = nock(config.api)
   .persist()
   .post('/api/3/action/authz_authorize', ckanAuthzConfig.body)
   .reply(200, {
-    help: 'http://ckan:5000/api/3/action/help_show?name=authz_authorize',
-    success: true,
-    result: {
-      requested_scopes: ckanAuthzConfig.body.scope,
-      granted_scopes: ckanAuthzConfig.body.scope,
-      token: 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZXMi===',
-      user_id: 'ckan_admin',
-      expires_at: '2020-03-27T19:01:15.714553+00:00',
-    },
+    "help": "http://localhost:5000/api/3/action/help_show?name=authz_authorize",
+    "success": true,
+    "result": {
+      "requested_scopes": [
+        "obj:myorg/dataset-name/*:write"
+      ],
+      "granted_scopes": [],
+      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZXMiOiIiLCJ== ",
+      "user_id": "admin",
+      "expires_at": "2020-04-22T20:08:41.102934+00:00"
+    }
   })
 
 const mainAuthzMock_forCloudStorageAccessGranterServiceMock = nock(config.api)
   .persist()
   .post(
-    `/api/3/action/${config.organizationId}/${config.datasetId}/objects/batch`,
+    `/${config.organizationId}/${config.datasetId}/objects/batch`,
     accessGranterConfig.body
   )
   .reply(200, {
@@ -122,8 +117,9 @@ const cloudStorageMock = nock(cloudStorageConfig.api, {
 
 const verifyFileUploadMock = nock('https://some-verify-callback.com')
   .persist()
-  .get('/')
+  .post('/')
   .reply(200, {
+    message: "Verify Uploaded Successfully",
     success: true,
   })
 
@@ -131,7 +127,7 @@ const verifyFileUploadMock = nock('https://some-verify-callback.com')
  * Start test
  */
 test('Can instantiate DataHub', (t) => {
-  const datahub = new DataHub(
+  const datahub = new ckanUploader.DataHub(
     config.authToken,
     config.organizationId,
     config.datasetId,
@@ -140,13 +136,9 @@ test('Can instantiate DataHub', (t) => {
   t.is(datahub.api, config.api)
 })
 
-test.skip('Push works with packaged dataset', async (t) => {
-  const resources = {
-    basePath: 'test/fixtures',
-    path: 'sample.csv',
-  }
-
-  await datahub.push(resources)
+test('Push works with packaged dataset', async (t) => {
+  const token = await uploader.ckanAuthz().then(response => response.result.token )
+  await uploader.push(file, token)
 
   t.is(ckanAuthzMock.isDone(), true)
   t.is(mainAuthzMock_forCloudStorageAccessGranterServiceMock.isDone(), true)
