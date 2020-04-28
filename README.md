@@ -17,7 +17,7 @@ Ckan3-js-sdk is a "SDK" in javascript for uploading files and updating metastore
 ## Built with
 
 - [crypto-js](https://cryptojs.gitbook.io/docs/)
-- [node-fetch](https://www.npmjs.com/package/node-fetch)
+- [axios](https://github.com/axios/axios)
 - [ava](https://github.com/avajs/ava)
 - [nock](https://github.com/nock/nock)
 
@@ -45,28 +45,29 @@ Inside that directory, it will generate the initial project structure.
 ```bash
 ckan3-js-sdk
 .
+├── CONTRIBUTING.md
 ├── lib
-│   ├── form-data.js
-│   ├── hash.js
+│   ├── file.js
 │   ├── index.js
 │   └── util
 │       ├── ckan-auth-api.js
 │       └── ckan-upload-api.js
 ├── License
 ├── package.json
+├── package-lock.json
 ├── README.md
 ├── test
 │   ├── fixtures
 │   │   └── sample.csv
-|   └── upload.test.js
+│   └── upload.test.js
 └── webpack.config.js
 ```
 
 ## Use
 
-Upload file with **NodeJS**
+Upload file from **NodeJS**
 
-```bash
+```js
 const ckanUploader = require('./lib/index')
 
 const file = new ckanUploader.FileAPI.NodeFileSystemFile('file.csv')
@@ -78,14 +79,33 @@ const uploader = new ckanUploader.DataHub(
   'api'
 )
 
-uploader.ckanAuthz()
-  .then(response => {
-    const token = response.result.token
-    return uploader.push(file, token)
-  })
-  .then(response => {
-    console.log(response)
-  })
+uploader
+  .ckanAuthz()
+  .then(response => uploader.push(file, response.result.token, onUploadProgress))
+  .then(response => console.log(response))
+```
+
+Upload file from **web applications**
+
+```js
+const file = new ckanUploader.FileAPI.HTML5File(event.target.files[0])
+
+const uploader = new ckanUploader.DataHub(
+  'key',
+  'organization-name',
+  'dataset-name',
+  'api'
+)
+
+const onUploadProgress = progressEvent => {
+  let progress = (progressEvent.loaded / progressEvent.total) * 100
+  console.log(progress)
+}
+
+uploader
+  .ckanAuthz()
+  .then(response => uploader.push(file, response.result.token, onUploadProgress))
+  .then(response => console.log(response))
 ```
 
 ## Build
@@ -113,6 +133,14 @@ watch the test
 ```bash
 $ npm run test:watch
 ```
+
+## Changelog
+
+Detailed changes for each release are documented in [CHANGELOG.md](CHANGELOG.md).
+
+## Contributing
+
+Please make sure to read the [CONTRIBUTING.md](CONTRIBUTING.md) Guide before making a pull request.
 
 ## License
 

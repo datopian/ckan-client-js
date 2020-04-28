@@ -27,14 +27,7 @@
   "license": "MIT",
   "dependencies": {
     "axios": "^0.19.2",
-    "chai-http": "^4.3.0",
-    "crypto-js": "^4.0.0",
-    "data.js": "",
-    "express": "^4.17.1",
-    "form-data": "^3.0.0",
-    "node-fetch": "",
-    "url-join": "^4.0.1",
-    "xlsx": "^0.15.6"
+    "crypto-js": "^4.0.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.8.4",
@@ -44,8 +37,6 @@
     "@babel/preset-env": "^7.9.5",
     "ava": "^3.5.2",
     "babel-loader": "^8.1.0",
-    "chai": "^4.2.0",
-    "mocha": "^7.1.1",
     "nock": "^12.0.3",
     "webpack": "^4.42.1",
     "webpack-cli": "^3.3.11"
