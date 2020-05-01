@@ -2,10 +2,11 @@
 
 # Ckan3-js-sdk
 
-[![pipeline](https://gitlab.com/datopian/experiments/ckan3-js-sdk/badges/master/pipeline.svg)](https://gitlab.com/datopian/experiments/ckan3-js-sdk)
 [![The MIT License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](http://opensource.org/licenses/MIT)
 
-Ckan3-js-sdk is a "SDK" in javascript for uploading files and updating metastore.<br> This SDK will communicate with Ckanext-authz-service, giftless service and uploading to Blob storage.
+Ckan3-js-sdk is a "SDK" in javascript for uploading files and updating metastore.<br> This SDK will communicate with [Ckanext-authz-service](https://github.com/datopian/ckanext-authz-service)(Use CKAN to provide authorization tokens for other related systems
+), [giftless service](https://github.com/datopian/giftless)(A highly customizable and extensible Git LFS server implemented in Python
+) and uploading to Blob storage.
 
 </div>
 
@@ -20,13 +21,14 @@ Ckan3-js-sdk is a "SDK" in javascript for uploading files and updating metastore
 - [axios](https://github.com/axios/axios)
 - [ava](https://github.com/avajs/ava)
 - [nock](https://github.com/nock/nock)
+- [webpack](https://webpack.js.org/)
 
 ## Install
 
 First, clone the repo via git:
 
 ```bash
-$ git clone git@gitlab.com:datopian/experiments/ckan3-js-sdk.git
+$ git clone git@github.com:datopian/ckan3-js-sdk.git
 ```
 
 And then install dependencies with npm.
@@ -45,6 +47,7 @@ Inside that directory, it will generate the initial project structure.
 ```bash
 ckan3-js-sdk
 .
+├── CHANGELOG.md
 ├── CONTRIBUTING.md
 ├── lib
 │   ├── file.js
