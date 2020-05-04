@@ -78,16 +78,11 @@ const ckanUploader = require('./lib/index')
 
 const file = new ckanUploader.FileAPI.NodeFileSystemFile('file.csv')
 
-const uploader = new ckanUploader.DataHub(
-  'key',
-  'organization-name',
-  'dataset-name',
-  'api'
-)
+const uploader = new ckanUploader.Uploader('key', 'organization-name', 'dataset-name', 'api')
 
 uploader
   .ckanAuthz()
-  .then(response => uploader.push(file, response.result.token, onUploadProgress))
+  .then(response => uploader.push(file, response.result.token))
   .then(response => console.log(response))
 ```
 
@@ -96,12 +91,7 @@ Upload file from **web applications**
 ```js
 const file = new ckanUploader.FileAPI.HTML5File(event.target.files[0])
 
-const uploader = new ckanUploader.DataHub(
-  'key',
-  'organization-name',
-  'dataset-name',
-  'api'
-)
+const uploader = new ckanUploader.Uploader('key', 'organization-name', 'dataset-name', 'api')
 
 const onUploadProgress = progressEvent => {
   let progress = (progressEvent.loaded / progressEvent.total) * 100

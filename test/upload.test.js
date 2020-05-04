@@ -48,12 +48,13 @@ const cloudStorageConfig = {
 /**
  * Instance of the Upload class
  */
-const uploader = new ckanUploader.DataHub(
+const uploader = new ckanUploader.Uploader(
   config.authToken,
   config.organizationId,
   config.datasetId,
   config.api
 )
+
 const file = new ckanUploader.FileAPI.NodeFileSystemFile('./test/fixtures/sample.csv')
 
 /**
@@ -126,8 +127,8 @@ const verifyFileUploadMock = nock('https://some-verify-callback.com')
 /**
  * Start test
  */
-test('Can instantiate DataHub', (t) => {
-  const datahub = new ckanUploader.DataHub(
+test('Can instantiate Uploader', (t) => {
+  const datahub = new ckanUploader.Uploader(
     config.authToken,
     config.organizationId,
     config.datasetId,
@@ -144,7 +145,12 @@ test('Push works with packaged dataset', async (t) => {
   t.is(mainAuthzMock_forCloudStorageAccessGranterServiceMock.isDone(), true)
   t.is(cloudStorageMock.isDone(), true)
   t.is(verifyFileUploadMock.isDone(), true)
+})
 
-  // TODO: make sure we have not altered the dataset.resources object in any way
-  //t.is(dataset.resources.length, 0)
+test('Dataset not altered', async (t) => {
+  const size = await file.size()
+  const sha256 = await file.sha256()
+
+  t.is(size, 701)
+  t.is(sha256, '7b28186dca74020a82ed969101ff551f97aed110d8737cea4763ce5be3a38b47')
 })
