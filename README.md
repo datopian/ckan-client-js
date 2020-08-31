@@ -1,13 +1,13 @@
 <div align="center">
 
-# Ckan3-js-sdk
+# Ckan-client-js
 
-[![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/datopian/ckan3-js-sdk/issues)
-![build](https://github.com/datopian/ckan3-js-sdk/workflows/ckan3-js-sdk%20actions/badge.svg)
+[![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/datopian/ckan-client-js/issues)
+![build](https://github.com/datopian/ckan-client-js/workflows/ckan-client-js%20actions/badge.svg)
 [![The MIT License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](http://opensource.org/licenses/MIT)
 
 
-Ckan3-js-sdk is a "SDK" in javascript for uploading files and updating metastore.<br> This SDK will communicate with [Ckanext-authz-service](https://github.com/datopian/ckanext-authz-service)(Use CKAN to provide authorization tokens for other related systems
+Ckan-client-js is a "SDK" in javascript for uploading files and updating metastore.<br> This SDK will communicate with [Ckanext-authz-service](https://github.com/datopian/ckanext-authz-service)(Use CKAN to provide authorization tokens for other related systems
 ), [giftless service](https://github.com/datopian/giftless)(A highly customizable and extensible Git LFS server implemented in Python
 ) and uploading to Blob storage.
 
@@ -31,24 +31,24 @@ Ckan3-js-sdk is a "SDK" in javascript for uploading files and updating metastore
 First, clone the repo via git:
 
 ```bash
-$ git clone git@github.com:datopian/ckan3-js-sdk.git
+$ git clone git@github.com:datopian/ckan-client-js.git
 ```
 
 And then install dependencies with npm.
 
 ```bash
-$ cd ckan3-js-sdk
+$ cd ckan-client-js
 ```
 
 ```bash
 $ npm install
 ```
 
-It will create a directory called `ckan3-js-sdk`.<br>
+It will create a directory called `ckan-client-js`.<br>
 Inside that directory, it will generate the initial project structure.
 
 ```bash
-ckan3-js-sdk
+ckan-client-js
 .
 ├── CHANGELOG.md
 ├── CONTRIBUTING.md
