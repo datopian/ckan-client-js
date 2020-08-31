@@ -8,4 +8,4 @@
 - After your pull request is merged, you can safely delete your branch.
 - More information related version control in [datopian documentation](https://playbook.datopian.com/style-guide/version-control/#commit-messages)
 
-### [<-- Back](https://github.com/datopian/ckan3-js-sdk)
+### [<-- Back](https://github.com/datopian/ckan-client-js)
