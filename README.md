@@ -77,12 +77,11 @@ Upload file from **NodeJS**
 const { Client, Open } = require('./lib/index')
 
 const file = new Open.FileAPI.NodeFileSystemFile('file.csv')
-const uploader = new Client('key', 'organization-name', 'dataset-name', 'api')
+const client = new Client('key', 'organization-name', 'dataset-name', 'api')
 
 client
   .ckanAuthz('http://localhost:5000')
   .then(response => client.push(file, response.result.token))
-  .then(response => console.log(response))
 ```
 
 Upload file from **web applications**
@@ -101,7 +100,6 @@ const onUploadProgress = progressEvent => {
 client
   .ckanAuthz('http://localhost:5000')
   .then(response => client.push(file, response.result.token, onUploadProgress))
-  .then(response => console.log(response))
 ```
 
 ## Build
