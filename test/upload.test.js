@@ -1,7 +1,7 @@
 const test = require('ava')
 const nock = require('nock')
 
-const ckanUploader = require('../lib/index')
+const { Client, Open } = require('../lib/index')
 
 /**
  * Push stuff
@@ -48,19 +48,19 @@ const cloudStorageConfig = {
 /**
  * Instance of the Upload class
  */
-const uploader = new ckanUploader.Uploader(
+const client = new Client(
   config.authToken,
   config.organizationId,
   config.datasetId,
   config.api
 )
 
-const file = new ckanUploader.FileAPI.NodeFileSystemFile('./test/fixtures/sample.csv')
+const file = new Open.NodeFileSystemFile('./test/fixtures/sample.csv')
 
 /**
  * Mock
  */
-const ckanAuthzMock = nock(config.api)
+const ckanAuthzMock = nock("http://localhost:5000")
   .persist()
   .post('/api/3/action/authz_authorize', ckanAuthzConfig.body)
   .reply(200, {
@@ -128,18 +128,20 @@ const verifyFileUploadMock = nock('https://some-verify-callback.com')
  * Start test
  */
 test('Can instantiate Uploader', (t) => {
-  const datahub = new ckanUploader.Uploader(
+  const datapub = new Client(
     config.authToken,
     config.organizationId,
     config.datasetId,
     config.api
   )
-  t.is(datahub.api, config.api)
+  t.is(datapub.api, config.api)
 })
 
 test('Push works with packaged dataset', async (t) => {
-  const token = await uploader.ckanAuthz().then(response => response.result.token )
-  await uploader.push(file, token)
+  const authzApi = "http://localhost:5000"
+  const token = await client.ckanAuthz(authzApi)
+                            .then(response => response.result.token )
+  await client.push(file, token)
 
   t.is(ckanAuthzMock.isDone(), true)
   t.is(mainAuthzMock_forCloudStorageAccessGranterServiceMock.isDone(), true)
