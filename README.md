@@ -74,33 +74,33 @@ ckan-client-js
 Upload file from **NodeJS**
 
 ```js
-const ckanUploader = require('./lib/index')
+const { Client, Open } = require('./lib/index')
 
-const file = new ckanUploader.FileAPI.NodeFileSystemFile('file.csv')
+const file = new Open.FileAPI.NodeFileSystemFile('file.csv')
+const uploader = new Client('key', 'organization-name', 'dataset-name', 'api')
 
-const uploader = new ckanUploader.Uploader('key', 'organization-name', 'dataset-name', 'api')
-
-uploader
-  .ckanAuthz()
-  .then(response => uploader.push(file, response.result.token))
+client
+  .ckanAuthz('http://localhost:5000')
+  .then(response => client.push(file, response.result.token))
   .then(response => console.log(response))
 ```
 
 Upload file from **web applications**
 
 ```js
-const file = new ckanUploader.FileAPI.HTML5File(event.target.files[0])
+import { Client, Open  } from "ckan3-js-sdk";
 
-const uploader = new ckanUploader.Uploader('key', 'organization-name', 'dataset-name', 'api')
+const file = new Open.FileAPI.HTML5File(event.target.files[0])
+const client = new Client('key', 'organization-name', 'dataset-name', 'api')
 
 const onUploadProgress = progressEvent => {
   let progress = (progressEvent.loaded / progressEvent.total) * 100
   console.log(progress)
 }
 
-uploader
-  .ckanAuthz()
-  .then(response => uploader.push(file, response.result.token, onUploadProgress))
+client
+  .ckanAuthz('http://localhost:5000')
+  .then(response => client.push(file, response.result.token, onUploadProgress))
   .then(response => console.log(response))
 ```
 

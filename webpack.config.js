@@ -13,7 +13,7 @@ module.exports = {
     path: path.resolve(__dirname, 'dist'),
     filename: '[name].js',
     libraryTarget: 'var',
-    library: 'ckanUploader',// The variable name to access the library
+    library: 'Client',// The variable name to access the library
 	},
   module: {
     rules: [
