@@ -8,7 +8,7 @@
   },
   "scripts": {
     "test": "ava test/upload.test.js --verbose",
-    "test:watch": "ava test/upload.test.js --verbose --watch",
+    "test:watch": "ava test/*.test.js --verbose --watch",
     "build": "webpack"
   },
   "repository": {
@@ -27,7 +27,8 @@
   "license": "MIT",
   "dependencies": {
     "axios": "^0.19.2",
-    "crypto-js": "^4.0.0"
+    "crypto-js": "^4.0.0",
+    "data.js": "^0.12.11"
   },
   "devDependencies": {
     "@babel/cli": "^7.8.4",

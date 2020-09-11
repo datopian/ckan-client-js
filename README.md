@@ -87,7 +87,7 @@ client
 Upload file from **web applications**
 
 ```js
-import { Client, Open  } from "ckan3-js-sdk";
+import { Client, Open  } from "ckanClient";
 
 const file = new Open.FileAPI.HTML5File(event.target.files[0])
 const client = new Client('key', 'organization-name', 'dataset-name', 'api')
