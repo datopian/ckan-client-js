@@ -77,7 +77,7 @@ Upload file from **NodeJS**
 const { Client, Open } = require('./lib/index')
 
 const file = new Open.FileAPI.NodeFileSystemFile('file.csv')
-const client = new Client('key', 'organization-name', 'dataset-name', 'api')
+const client = new Client('key', 'organization-name', 'dataset-name', 'apiUrl')
 
 client
   .ckanAuthz('http://localhost:5000')

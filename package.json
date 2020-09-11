@@ -1,7 +1,7 @@
 {
-  "name": "ckan3-js-sdk",
+  "name": "ckanClient",
   "version": "1.0.0",
-  "description": "Ckan3-js-sdk is a SDK in javascript for uploading files and updating metastore",
+  "description": "ckan-client-js is a SDK in javascript for uploading files and updating metastore",
   "main": "lib/index.js",
   "directories": {
     "test": "test"
@@ -13,10 +13,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/datopian/ckan3-js-sdk"
+    "url": "https://github.com/datopian/ckan-client-js"
   },
   "bugs": {
-    "url": "https://github.com/datopian/ckan3-js-sdk/issues"
+    "url": "https://github.com/datopian/ckan-client-js/issues"
   },
   "keywords": [
     "node",
@@ -27,8 +27,7 @@
   "license": "MIT",
   "dependencies": {
     "axios": "^0.19.2",
-    "crypto-js": "^4.0.0",
-    "data.js": "^0.12.11"
+    "crypto-js": "^4.0.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.8.4",
@@ -40,6 +39,7 @@
     "babel-loader": "^8.1.0",
     "nock": "^12.0.3",
     "webpack": "^4.42.1",
-    "webpack-cli": "^3.3.11"
+    "webpack-cli": "^3.3.11",
+    "data.js": "^0.12.11"
   }
 }
