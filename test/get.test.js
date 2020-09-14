@@ -3,6 +3,7 @@ const nock = require('nock')
 const urlParser = require('url')
 
 const { Client } = require('../lib/index')
+const fs = require('fs')
 
 const config = {
   api: 'http://ckan:5000',
@@ -18,27 +19,10 @@ const client = new Client(
   config.api
 )
 
-const metadataBody = {
-  path: 'test/fixtures/sample.csv',
-  pathType: 'local',
-  name: 'sample',
-  format: 'csv',
-  mediatype: 'text/csv',
-  encoding: 'UTF-8',
-  resources: [],
-}
-
-const resourceBody = {
-  path: 'test/fixtures/sample.csv',
-  pathType: 'local',
-  name: 'sample',
-  format: 'csv',
-  mediatype: 'text/csv',
-  encoding: 'UTF-8',
-  package_id: 'my_dataset_name',
-}
-
 test('get package', async (t) => {
+  const getPackageResponseMock = JSON.parse(
+    await fs.readFileSync(__dirname + '/mocks/getPackageResponse.json')
+  )
   // Testing dataname/id
   let scope = nock(config.api)
     .get('/api/3/action/package_show')
@@ -51,17 +35,15 @@ test('get package', async (t) => {
         use_default_schema: 'false',
         include_tracking: 'false',
       })
-      return {
-        success: true,
-        result: {},
-      }
+      return getPackageResponseMock
     })
 
-  await client.getPackage({
+  const response = await client.getPackage({
     id: 'my_dataset',
   })
 
   t.is(scope.isDone(), true)
+  t.deepEqual(response, getPackageResponseMock)
 
   // Testing use_default_schema and include_tracking
   scope = nock(config.api)
@@ -76,10 +58,7 @@ test('get package', async (t) => {
         use_default_schema: 'true',
         include_tracking: 'true',
       })
-      return {
-        success: true,
-        result: {},
-      }
+      return getPackageResponseMock
     })
 
   await client.getPackage({
