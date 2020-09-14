@@ -184,7 +184,7 @@ const resourceMock = nock(config.api)
     }
   })
 
-test('create a dataset', async (t) => {
+test('action create a dataset', async (t) => {
   const client = new Client(
     config.authToken,
     config.organizationId,
@@ -192,7 +192,7 @@ test('create a dataset', async (t) => {
     config.api
   )
 
-  const response = await client.put('package_create', { "name": "my_dataset", "owner_org": "myorg"})
+  const response = await client.action('package_create', { "name": "my_dataset", "owner_org": "myorg"})
 
   t.is(client.api, config.api)
   t.is(packageCreateMock.isDone(), true)
@@ -201,15 +201,10 @@ test('create a dataset', async (t) => {
   t.is(response.result.organization.name, "myorg")
 })
 
-test('put metadata', async (t) => {
+test('push metadata', async (t) => {
   const path = 'test/fixtures/sample.csv'
-  const file = await f11s.open(path)
-  const dataset = new f11s.Dataset({
-    ...file.descriptor,
-    resources: [],
-  })
 
-  const response = await client.put('package_create', dataset.descriptor)
+  const response = await client.push('package_create', path)
 
   t.is(packageCreateMock.isDone(), true)
   t.is(response.success, true)
@@ -217,14 +212,14 @@ test('put metadata', async (t) => {
   t.deepEqual(response.result.resources, [])
 })
 
-test('put_resource create or update a resource', async (t) => {
+test('action create or update a resource', async (t) => {
   const path = 'test/fixtures/sample.csv'
   const file = await f11s.open(path)
 
   // Dataset must exist
   file.descriptor.package_id = "my_dataset_name"
 
-  const response = await client.put('resource_create', file.descriptor)
+  const response = await client.action('resource_create', file.descriptor)
 
   t.is(resourceMock.isDone(), true)
   t.is(response.success, true)

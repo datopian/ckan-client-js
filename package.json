@@ -7,7 +7,7 @@
     "test": "test"
   },
   "scripts": {
-    "test": "ava test/upload.test.js --verbose",
+    "test": "ava test/*.test.js --verbose",
     "test:watch": "ava test/*.test.js --verbose --watch",
     "build": "webpack",
     "build:watch": "webpack --watch"

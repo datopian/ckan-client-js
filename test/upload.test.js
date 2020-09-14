@@ -141,7 +141,7 @@ test('Push works with packaged dataset', async (t) => {
   const authzApi = "http://localhost:5000"
   const token = await client.ckanAuthz(authzApi)
                             .then(response => response.result.token )
-  await client.push(file, token)
+  await client.pushBlob(file, token)
 
   t.is(ckanAuthzMock.isDone(), true)
   t.is(mainAuthzMock_forCloudStorageAccessGranterServiceMock.isDone(), true)
