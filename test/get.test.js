@@ -1,7 +1,8 @@
 const test = require('ava')
-const f11s = require('data.js')
+const nock = require('nock')
+const urlParser = require('url')
+
 const { Client } = require('../lib/index')
-const { getGetPackageMock } = require('./mocks/get.mocks')
 
 const config = {
   api: 'http://ckan:5000',
@@ -37,23 +38,55 @@ const resourceBody = {
   package_id: 'my_dataset_name',
 }
 
-test('get a dataset', async (t) => {
-  const client = new Client(
-    config.authToken,
-    config.organizationId,
-    config.datasetId,
-    config.api
-  )
+test('get package', async (t) => {
+  // Testing dataname/id
+  let scope = nock(config.api)
+    .get('/api/3/action/package_show')
+    .query(true)
+    .reply(200, (url) => {
+      const queryObject = urlParser.parse(url, true).query
+      t.is(client.api, config.api)
+      t.deepEqual(queryObject, {
+        id: 'my_dataset',
+        use_default_schema: 'false',
+        include_tracking: 'false',
+      })
+      return {
+        success: true,
+        result: {},
+      }
+    })
 
-  const response = await client.getPackage({
+  await client.getPackage({
     id: 'my_dataset',
-    useDefaultSchema: false,
-    includeTracking: false,
   })
 
-  t.is(client.api, config.api)
-  t.is(getGetPackageMock(config).isDone(), true)
-  t.is(response.success, true)
-  t.is(response.result.name, config.datasetId)
-  t.is(response.result.organization.name, config.organizationId)
+  t.is(scope.isDone(), true)
+
+  // Testing use_default_schema and include_tracking
+  scope = nock(config.api)
+    .persist()
+    .get('/api/3/action/package_show')
+    .query(true)
+    .reply(200, (url) => {
+      const queryObject = urlParser.parse(url, true).query
+      t.is(client.api, config.api)
+      t.deepEqual(queryObject, {
+        id: 'my_dataset1',
+        use_default_schema: 'true',
+        include_tracking: 'true',
+      })
+      return {
+        success: true,
+        result: {},
+      }
+    })
+
+  await client.getPackage({
+    id: 'my_dataset1',
+    useDefaultSchema: true,
+    includeTracking: true,
+  })
+
+  t.is(scope.isDone(), true)
 })
