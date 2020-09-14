@@ -1,6 +1,6 @@
 const test = require('ava')
 const nock = require('nock')
-const f11s = require('data.js')
+const f11s = require('data.js');
 const { Client } = require('../lib/index')
 
 /**
@@ -184,6 +184,83 @@ const resourceMock = nock(config.api)
     }
   })
 
+const getAction = nock(config.api)
+  .persist()
+  .get('/api/3/action/package_show', {
+    "name_or_id": "3a1aa4af-9f00-490b-956e-2b063ed04961"
+    })
+  .reply(200, {
+    "help": "http://localhost:5000/api/3/action/help_show?name=package_show",
+    "success": true,
+    "result": {
+      "license_title": null,
+      "maintainer": null,
+      "relationships_as_object": [],
+      "private": false,
+      "maintainer_email": null,
+      "num_tags": 0,
+      "id": "3a1aa4af-9f00-490b-956e-2b063ed04961",
+      "metadata_created": "2020-09-10T23:15:09.975155",
+      "metadata_modified": "2020-09-14T11:52:03.155843",
+      "author": null,
+      "author_email": null,
+      "state": "active",
+      "version": null,
+      "creator_user_id": "ceb0d8c2-352b-4a6c-b2c8-2a1a4190192b",
+      "type": "dataset",
+      "resources": [
+        {
+          "mimetype": null,
+          "cache_url": null,
+          "hash": "",
+          "description": "",
+          "name": "my_dataset_name",
+          "format": "",
+          "url": "",
+          "datastore_active": false,
+          "cache_last_updated": null,
+          "package_id": "3a1aa4af-9f00-490b-956e-2b063ed04961",
+          "created": "2020-09-11T02:40:54.757756",
+          "state": "active",
+          "mimetype_inner": null,
+          "last_modified": null,
+          "position": 0,
+          "revision_id": "a50f4241-7c92-48cd-a51a-6e83ec9be694",
+          "url_type": null,
+          "id": "bb4b2f10-d640-4305-a43d-4b369600ff82",
+          "resource_type": null,
+          "size": null
+        },
+      ],
+    "num_resources": 20,
+    "tags": [],
+    "groups": [],
+    "license_id": null,
+    "relationships_as_subject": [],
+    "organization": {
+      "description": "my org",
+      "created": "2020-04-14T13:27:47.434967",
+      "title": "myorg",
+      "name": "myorg",
+      "is_organization": true,
+      "state": "active",
+      "image_url": "",
+      "revision_id": "bff67202-a21e-470b-9b67-14e65ad85fa2",
+      "type": "organization",
+      "id": "f3fce98a-4750-4d09-a5d1-d5e1b995a2e8",
+      "approval_status": "approved"
+    },
+    "name": "my_dataset_name",
+    "isopen": false,
+    "url": "http://civicdatatest.cloudapp.net/storage/f/testdata/test.csv",
+    "notes": "A long description of my dataset",
+    "owner_org": "f3fce98a-4750-4d09-a5d1-d5e1b995a2e8",
+    "extras": [],
+    "title": "my_dataset_name",
+    "revision_id": "959e0ee9-b902-4568-bd71-ff0d8c77bb18"
+  }
+})
+
 test('create a dataset', async (t) => {
   const client = new Client(
     config.authToken,
@@ -192,7 +269,7 @@ test('create a dataset', async (t) => {
     config.api
   )
 
-  const response = await client.put('package_create', { "name": "my_dataset", "owner_org": "myorg"})
+  const response = await client.action('package_create', { "name": "my_dataset", "owner_org": "myorg"})
 
   t.is(client.api, config.api)
   t.is(packageCreateMock.isDone(), true)
@@ -209,7 +286,7 @@ test('put metadata', async (t) => {
     resources: [],
   })
 
-  const response = await client.put('package_create', dataset.descriptor)
+  const response = await client.action('package_create', dataset.descriptor)
 
   t.is(packageCreateMock.isDone(), true)
   t.is(response.success, true)
@@ -224,11 +301,21 @@ test('put_resource create or update a resource', async (t) => {
   // Dataset must exist
   file.descriptor.package_id = "my_dataset_name"
 
-  const response = await client.put('resource_create', file.descriptor)
+  const response = await client.action('resource_create', file.descriptor)
 
   t.is(resourceMock.isDone(), true)
   t.is(response.success, true)
   t.is(response.result.name, "sample")
   t.is(response.result.format, "CSV")
   t.is(response.result.mediatype, "text/csv")
+})
+
+test('action method GET', async (t) => {
+
+  const response = await client.action('package_show', {
+    "name_or_id": "3a1aa4af-9f00-490b-956e-2b063ed04961"
+    }, "GET")
+
+  t.is(resourceMock.isDone(), true)
+  t.is(response.success, true)
 })
