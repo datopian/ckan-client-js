@@ -21,7 +21,12 @@ const client = new Client(
 
 test('get package', async (t) => {
   const getPackageResponseMock = JSON.parse(
-    await fs.readFileSync(__dirname + '/mocks/getPackageResponse.json')
+    await fs.readFileSync(__dirname + '/mocks/getPackageCkanResponse.json')
+  )
+  const packageResponseConvertedToFrictionless = JSON.parse(
+    await fs.readFileSync(
+      __dirname + '/mocks/getPackageFrictionlessResponse.json'
+    )
   )
   // Testing dataname/id
   let scope = nock(config.api)
@@ -38,12 +43,10 @@ test('get package', async (t) => {
       return getPackageResponseMock
     })
 
-  const response = await client.getPackage({
-    id: 'my_dataset',
-  })
+  const response = await client.retrieve('my_dataset')
 
   t.is(scope.isDone(), true)
-  t.deepEqual(response, getPackageResponseMock)
+  t.deepEqual(response, packageResponseConvertedToFrictionless)
 
   // Testing use_default_schema and include_tracking
   scope = nock(config.api)
@@ -61,11 +64,7 @@ test('get package', async (t) => {
       return getPackageResponseMock
     })
 
-  await client.getPackage({
-    id: 'my_dataset1',
-    useDefaultSchema: true,
-    includeTracking: true,
-  })
+  await client.retrieve('my_dataset1', true, true)
 
   t.is(scope.isDone(), true)
 })
