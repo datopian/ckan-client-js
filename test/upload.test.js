@@ -1,5 +1,6 @@
 const test = require('ava')
 const nock = require('nock')
+const f11s = require('data.js')
 
 const { Client, Open } = require('../lib/index')
 
@@ -26,7 +27,6 @@ const accessGranterConfig = {
     ref: { name: 'refs/heads/contrib' },
     objects: [
       {
-        oid: '7b28186dca74020a82ed969101ff551f97aed110d8737cea4763ce5be3a38b47',
         size: 701,
       },
     ],
@@ -60,7 +60,7 @@ const file = new Open.NodeFileSystemFile('./test/fixtures/sample.csv')
 /**
  * Mock
  */
-const ckanAuthzMock = nock("http://localhost:5000")
+const ckanAuthzMock = nock("http://127.0.0.1")
   .persist()
   .post('/api/3/action/authz_authorize', ckanAuthzConfig.body)
   .reply(200, {
@@ -87,8 +87,8 @@ const mainAuthzMock_forCloudStorageAccessGranterServiceMock = nock(config.api)
     transfer: 'basic',
     objects: [
       {
-        oid: '8857053d874453bbe8e7613b09874e2d8fc9ddffd2130a579ca918301c31b369',
-        size: 123,
+        oid: "8857053d874453bbe8e7613b09874e2d8fc9ddffd2130a579ca918301c31b369",
+        size: 701,
         authenticated: true,
         actions: {
           upload: {
@@ -137,13 +137,18 @@ test('Can instantiate Uploader', (t) => {
   t.is(datapub.api, config.api)
 })
 
-test('Push works with packaged dataset', async (t) => {
-  const authzApi = "http://localhost:5000"
-  const token = await client.ckanAuthz(authzApi)
-                            .then(response => response.result.token )
-  await client.push(file, token)
+test('Can get JWT token', async (t) => {
+  const token = await client.doBlobAuthz()
 
   t.is(ckanAuthzMock.isDone(), true)
+  t.is(token, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZXMiOiIiLCJ== ")
+})
+
+test('Push works with packaged dataset', async (t) => {
+  const path = 'test/fixtures/sample.csv'
+  const resource = f11s.open(path)
+  await client.pushBlob(resource)
+
   t.is(mainAuthzMock_forCloudStorageAccessGranterServiceMock.isDone(), true)
   t.is(cloudStorageMock.isDone(), true)
   t.is(verifyFileUploadMock.isDone(), true)
