@@ -36,9 +36,7 @@ test('get package', async (t) => {
       const queryObject = urlParser.parse(url, true).query
       t.is(client.api, config.api)
       t.deepEqual(queryObject, {
-        id: 'my_dataset',
-        use_default_schema: 'false',
-        include_tracking: 'false',
+        name_or_id: 'my_dataset',
       })
       return getPackageResponseMock
     })
@@ -47,24 +45,4 @@ test('get package', async (t) => {
 
   t.is(scope.isDone(), true)
   t.deepEqual(response, packageResponseConvertedToFrictionless)
-
-  // Testing use_default_schema and include_tracking
-  scope = nock(config.api)
-    .persist()
-    .get('/api/3/action/package_show')
-    .query(true)
-    .reply(200, (url) => {
-      const queryObject = urlParser.parse(url, true).query
-      t.is(client.api, config.api)
-      t.deepEqual(queryObject, {
-        id: 'my_dataset1',
-        use_default_schema: 'true',
-        include_tracking: 'true',
-      })
-      return getPackageResponseMock
-    })
-
-  await client.retrieve('my_dataset1', true, true)
-
-  t.is(scope.isDone(), true)
 })
