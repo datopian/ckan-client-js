@@ -1,0 +1,17 @@
+{
+  "description": "GDPs list",
+  "schema": {
+    "fields": [
+      { "name": "id", "type": "integer" },
+      { "name": "title", "type": "string" }
+    ]
+  },
+  "name": "gdp",
+  "resources": [
+    {
+      "name": "data.csv",
+      "path": "http://someplace.com/data.csv",
+      "bytes": 100
+    }
+  ]
+}

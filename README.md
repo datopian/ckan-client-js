@@ -74,32 +74,30 @@ ckan-client-js
 Upload file from **NodeJS**
 
 ```js
-const { Client, Open } = require('./lib/index')
+const { Client } = require('./lib/index')
+const f11s = require('data.js')
 
-const file = new Open.FileAPI.NodeFileSystemFile('file.csv')
 const client = new Client('key', 'organization-name', 'dataset-name', 'apiUrl')
+const resource = f11s.open(file_path)
 
-client
-  .ckanAuthz('http://localhost:5000')
-  .then(response => client.push(file, response.result.token))
+client.pushBlob(resource)
 ```
 
 Upload file from **web applications**
 
 ```js
-import { Client, Open  } from "ckanClient";
+import { Client } from "ckanClient";
+import f11s from "data.js"
 
-const file = new Open.FileAPI.HTML5File(event.target.files[0])
 const client = new Client('key', 'organization-name', 'dataset-name', 'api')
+const resource = f11s.open(file)
+
+client.pushBlob(resource, onUploadProgress)
 
 const onUploadProgress = progressEvent => {
   let progress = (progressEvent.loaded / progressEvent.total) * 100
   console.log(progress)
 }
-
-client
-  .ckanAuthz('http://localhost:5000')
-  .then(response => client.push(file, response.result.token, onUploadProgress))
 ```
 
 ## Build
