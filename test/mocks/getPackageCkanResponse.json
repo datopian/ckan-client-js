@@ -2,6 +2,7 @@
   "success": true,
   "result": {
     "name": "gdp",
+    "url": "https://datopian.com",
     "resources": [
       {
         "name": "data.csv",

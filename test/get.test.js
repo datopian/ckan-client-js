@@ -25,7 +25,7 @@ test('get package', async (t) => {
   )
   const packageResponseConvertedToFrictionless = JSON.parse(
     await fs.readFileSync(
-      __dirname + '/mocks/getPackageFrictionlessResponse.json'
+      __dirname + '/mocks/frictionless-dataset-converted-from-ckan.json'
     )
   )
   // Testing dataname/id
