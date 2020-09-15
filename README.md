@@ -75,20 +75,24 @@ Upload file from **NodeJS**
 
 ```js
 const { Client } = require('./lib/index')
+const f11s = require('data.js')
 
 const client = new Client('key', 'organization-name', 'dataset-name', 'apiUrl')
+const resource = f11s.open(file_path)
 
-client._pushBlob(file)
+client.pushBlob(resource)
 ```
 
 Upload file from **web applications**
 
 ```js
 import { Client } from "ckanClient";
+import f11s from "data.js"
 
 const client = new Client('key', 'organization-name', 'dataset-name', 'api')
+const resource = f11s.open(file)
 
-client._pushBlob(file, onUploadProgress)
+client.pushBlob(resource, onUploadProgress)
 
 const onUploadProgress = progressEvent => {
   let progress = (progressEvent.loaded / progressEvent.total) * 100

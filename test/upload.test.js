@@ -1,5 +1,6 @@
 const test = require('ava')
 const nock = require('nock')
+const f11s = require('data.js')
 
 const { Client, Open } = require('../lib/index')
 
@@ -137,7 +138,7 @@ test('Can instantiate Uploader', (t) => {
 })
 
 test('Can get JWT token', async (t) => {
-  const token = await client._doBlobAuthz()
+  const token = await client.doBlobAuthz()
 
   t.is(ckanAuthzMock.isDone(), true)
   t.is(token, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZXMiOiIiLCJ== ")
@@ -145,8 +146,8 @@ test('Can get JWT token', async (t) => {
 
 test('Push works with packaged dataset', async (t) => {
   const path = 'test/fixtures/sample.csv'
-
-  await client._pushBlob(path)
+  const resource = f11s.open(path)
+  await client.pushBlob(resource)
 
   t.is(mainAuthzMock_forCloudStorageAccessGranterServiceMock.isDone(), true)
   t.is(cloudStorageMock.isDone(), true)
