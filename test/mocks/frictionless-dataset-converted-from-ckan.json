@@ -1,5 +1,6 @@
 {
   "description": "GDPs list",
+  "homepage": "https://datopian.com",
   "schema": {
     "fields": [
       { "name": "id", "type": "integer" },

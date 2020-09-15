@@ -1,0 +1,22 @@
+{
+  "name": "gdp",
+  "url": "https://datopian.com",
+  "resources": [
+    {
+      "name": "data.csv",
+      "url": "http://someplace.com/data.csv",
+      "size": 100
+    }
+  ],
+  "description": "GDPs list",
+  "schema": {
+    "fields": [
+      { "name": "id", "type": "integer" },
+      { "name": "title", "type": "string" }
+    ]
+  },
+  "isopen": true,
+  "num_tags": 1,
+  "num_resources": 10,
+  "state": "active"
+}

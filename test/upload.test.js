@@ -33,7 +33,7 @@ const accessGranterConfig = {
   },
   headers: {
     Accept: 'application/vnd.git-lfs+json',
-    "Content-Type": 'application/vnd.git-lfs+json',
+    'Content-Type': 'application/vnd.git-lfs+json',
     Authorization:
       'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZXMi===',
   },
@@ -60,21 +60,19 @@ const file = new Open.NodeFileSystemFile('./test/fixtures/sample.csv')
 /**
  * Mock
  */
-const ckanAuthzMock = nock("http://127.0.0.1")
+const ckanAuthzMock = nock('http://127.0.0.1')
   .persist()
   .post('/api/3/action/authz_authorize', ckanAuthzConfig.body)
   .reply(200, {
-    "help": "http://localhost:5000/api/3/action/help_show?name=authz_authorize",
-    "success": true,
-    "result": {
-      "requested_scopes": [
-        "obj:myorg/dataset-name/*:write"
-      ],
-      "granted_scopes": [],
-      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZXMiOiIiLCJ== ",
-      "user_id": "admin",
-      "expires_at": "2020-04-22T20:08:41.102934+00:00"
-    }
+    help: 'http://localhost:5000/api/3/action/help_show?name=authz_authorize',
+    success: true,
+    result: {
+      requested_scopes: ['obj:myorg/dataset-name/*:write'],
+      granted_scopes: [],
+      token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZXMiOiIiLCJ== ',
+      user_id: 'admin',
+      expires_at: '2020-04-22T20:08:41.102934+00:00',
+    },
   })
 
 const mainAuthzMock_forCloudStorageAccessGranterServiceMock = nock(config.api)
@@ -87,12 +85,14 @@ const mainAuthzMock_forCloudStorageAccessGranterServiceMock = nock(config.api)
     transfer: 'basic',
     objects: [
       {
-        oid: "8857053d874453bbe8e7613b09874e2d8fc9ddffd2130a579ca918301c31b369",
+        oid:
+          '8857053d874453bbe8e7613b09874e2d8fc9ddffd2130a579ca918301c31b369',
         size: 701,
         authenticated: true,
         actions: {
           upload: {
-            href: 'https://myaccount.blob.core.windows.net/mycontainer/my-blob',
+            href:
+              'https://myaccount.blob.core.windows.net/mycontainer/my-blob',
             header: accessGranterConfig.headers,
             expires_in: 86400,
           },
@@ -120,7 +120,7 @@ const verifyFileUploadMock = nock('https://some-verify-callback.com')
   .persist()
   .post('/')
   .reply(200, {
-    message: "Verify Uploaded Successfully",
+    message: 'Verify Uploaded Successfully',
     success: true,
   })
 
@@ -141,7 +141,7 @@ test('Can get JWT token', async (t) => {
   const token = await client.doBlobAuthz()
 
   t.is(ckanAuthzMock.isDone(), true)
-  t.is(token, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZXMiOiIiLCJ== ")
+  t.is(token, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZXMiOiIiLCJ== ')
 })
 
 test('Push works with packaged dataset', async (t) => {
@@ -159,5 +159,8 @@ test('Dataset not altered', async (t) => {
   const sha256 = await file.sha256()
 
   t.is(size, 701)
-  t.is(sha256, '7b28186dca74020a82ed969101ff551f97aed110d8737cea4763ce5be3a38b47')
+  t.is(
+    sha256,
+    '7b28186dca74020a82ed969101ff551f97aed110d8737cea4763ce5be3a38b47'
+  )
 })
