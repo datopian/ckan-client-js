@@ -23,6 +23,22 @@
 - [nock](https://github.com/nock/nock)
 - [webpack](https://webpack.js.org/)
 
+**Table of Contents**
+
+- [Install](#install)
+- [How to use?](#how-to-use?)
+- [API](#api)
+  - [Setting up the Client](#setting-up-the-client)
+  - [Create a dataset](#createa-dataset)
+  - [Retrieve the dataset](#retrieve-the-dataset)
+  - [Update the dataset](#update-the-dataset)
+  - [Create a dataset](#create-a-dataset)
+  - [Advanced actions](#advanced-actions)
+  - [Uploading a resource](#uploading-a-resource)
+- [Build](#build)
+- [Tests](#tests)
+- [Changelog](#changelog)
+
 ## Install
 
 First, clone the repo via git:
@@ -66,7 +82,7 @@ ckan-client-js
 └── webpack.config.js
 ```
 
-## Use
+## How to use?
 
 Importing in **NodeJS**
 
@@ -83,6 +99,8 @@ import { Client } from "ckanClient";
 import f11s from "data.js"  // This is for working with datasets
 ...
 ```
+
+## API
 
 ### Setting up the Client
 
