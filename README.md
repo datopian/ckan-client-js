@@ -6,9 +6,7 @@
 [![build](https://github.com/datopian/ckan-client-js/workflows/ckan-client-js%20actions/badge.svg)](https://github.com/datopian/ckan-client-js/actions)
 [![The MIT License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](http://opensource.org/licenses/MIT)
 
-Ckan-client-js is a "SDK" in javascript for uploading files and updating metastore.<br> This SDK will communicate with [Ckanext-authz-service](https://github.com/datopian/ckanext-authz-service)(Use CKAN to provide authorization tokens for other related systems
-), [giftless service](https://github.com/datopian/giftless)(A highly customizable and extensible Git LFS server implemented in Python
-) and uploading to Blob storage.
+`ckan-client-js` is a Javascript client "SDK" for interacting with the CKAN data management system (DMS). It covers the whole action API as well as convenience methods for uploading files, accessing the action API, updating the metastore etc.
 
 </div>
 
@@ -86,7 +84,7 @@ import f11s from "data.js"  // This is for working with datasets
 ...
 ```
 
-Using the methods
+### Setting up the Client
 
 ```js
 const client = new Client(
@@ -95,9 +93,13 @@ const client = new Client(
   'my-dataset-id',
   'api-url'
 )
+```
 
+### Create a dataset
+
+```js
 // create a dataset
-let dataset = await client.create({
+const dataset = await client.create({
   name: 'market',
 })
 console.log(dataset)
@@ -116,12 +118,31 @@ console.log(dataset)
 //   title: 'market',
 //   revision_id: 'cfae5ff5-9b2e-4c91-965d-c0a2c740da37'
 // }
+```
 
-// get a dataset by id or name
-dataset = await client.retrieve('03de2e7a-6e52-4410-b6b1-49491f0f4d5a')
-// or you can specify the name
-// dataset = await client.retrieve('market')
+### Retrieve the dataset
 
+By id
+
+```js
+const dataset = await client.retrieve('03de2e7a-6e52-4410-b6b1-49491f0f4d5a')
+```
+
+Or by the name
+
+```js
+const dataset = await client.retrieve('market')
+```
+
+### Update the dataset
+
+```js
+await client.push(dataset)
+```
+
+Example of pushing a resource and updating the dataset
+
+```js
 // pushing some resource to the dataset
 dataset.resources.push({
   bytes: 12,
@@ -160,13 +181,15 @@ console.log(updatedDataset)
 // }
 ```
 
-If you want to make more advanced requests to CKAN API, then you can use `action()` method. Please note that it accept CKAN dataset and returns CKAN dataset. If you want to have frictionless data you have to use [CKAN<=>Frictionless Mapper](https://github.com/datopian/frictionless-ckan-mapper-js)
+### Advanced actions
+
+If you want to make more advanced requests to CKAN API, then you can use `action()` method. Please note that it accepts CKAN dataset and returns CKAN dataset. If you want to have frictionless data you have to use [CKAN<=>Frictionless Mapper](https://github.com/datopian/frictionless-ckan-mapper-js)
 
 ```js
 // Update the the dataset name
 const response = await client.action('package_update', {
   id: '03de2e7a-6e52-4410-b6b1-49491f0f4d5a',
-  name: 'market1',
+  title: 'New title',
 })
 console.log(response.result)
 // {
@@ -192,29 +215,22 @@ console.log(response.result)
 //   license_id: null,
 //   relationships_as_subject: [],
 //   organization: null,
-//   name: 'market1',
+//   name: 'market',
 //   isopen: false,
 //   url: null,
 //   notes: null,
 //   owner_org: null,
 //   extras: [],
-//   title: 'market',
+//   title: 'New Title',
 //   revision_id: '2b3fc86b-fcc0-47cc-92f2-a6c4830638f4'
 // }
 ```
 
-Uploading file and updating the dataset
+### Uploading a resource
 
 ```js
-// This file can be also a browser File attached by the user, if it's in browser environment
-const file = {
-  name: 'mydata',
-  data: { foo: 'bar' },
-}
-
-const resource = f11s.open(file)
-// If it is in Node you can also get the resource by reading the file
-// const resource = f11s.open('path/to/file')
+// If it is in Browser you can pass an attached file
+const resource = f11s.open('path/to/example.csv')
 
 client.pushBlob(resource)
 // If you are in browser you can also track the progress, in the second argument
@@ -222,8 +238,12 @@ client.pushBlob(resource)
 //   let progress = (progressEvent.loaded / progressEvent.total) * 100
 //   console.log(progress)
 // })
-const dataset = await client.retrieve('market')
+
+const dataset = await client.create({
+  name: 'dataset-name',
+})
 dataset.resources.push(resource.descriptor)
+
 const updatedDataset = await client.push(dataset)
 ```
 
