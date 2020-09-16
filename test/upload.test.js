@@ -10,6 +10,7 @@ const { Client, Open } = require('../lib/index')
 const config = {
   authToken: 'be270cae-1c77-4853-b8c1-30b6cf5e9878',
   api: 'http://127.0.0.1',
+  lfs: 'http://127.0.0.1',
   organizationId: 'myorg',
   datasetId: 'dataset-name',
 }
@@ -52,7 +53,8 @@ const client = new Client(
   config.authToken,
   config.organizationId,
   config.datasetId,
-  config.api
+  config.api,
+  config.lfs
 )
 
 const file = new Open.NodeFileSystemFile('./test/fixtures/sample.csv')
@@ -132,7 +134,8 @@ test('Can instantiate Uploader', (t) => {
     config.authToken,
     config.organizationId,
     config.datasetId,
-    config.api
+    config.api,
+    config.lfs
   )
   t.is(datapub.api, config.api)
 })
