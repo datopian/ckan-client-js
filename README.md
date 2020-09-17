@@ -10,38 +10,23 @@
 
 </div>
 
-## Prerequisites
+## Frictionless Formats
+
+The client uses [Frictionless formats][f11s] by default for describing dataset and resource objects passed to client methods. Internally we then use the [CKAN<=>Frictionless Mapper][c2f] to convert to CKAN formats before calling the API. Thus, you can use Frictionless Formats by default with the client. (As CKAN moves to Frictionless to default this will gradually become unnecessary).
+
+[f11s]: https://specs.frictionlessdata.io/
+[c2f]: https://github.com/datopian/frictionless-ckan-mapper-js
+
+## Install
+
+### Node
+
+Prerequisites
 
 - [Node](https://nodejs.org/en/)
 - [NPM Package Manager](https://www.npmjs.com/)
 
-## Built with
-
-- [crypto-js](https://cryptojs.gitbook.io/docs/)
-- [axios](https://github.com/axios/axios)
-- [ava](https://github.com/avajs/ava)
-- [nock](https://github.com/nock/nock)
-- [webpack](https://webpack.js.org/)
-
-**Table of Contents**
-
-- [Install](#install)
-- [How to use?](#how-to-use?)
-- [API](#api)
-  - [Setting up the Client](#setting-up-the-client)
-  - [Create a dataset](#createa-dataset)
-  - [Retrieve the dataset](#retrieve-the-dataset)
-  - [Update the dataset](#update-the-dataset)
-  - [Create a dataset](#create-a-dataset)
-  - [Advanced actions](#advanced-actions)
-  - [Uploading a resource](#uploading-a-resource)
-- [Build](#build)
-- [Tests](#tests)
-- [Changelog](#changelog)
-
-## Install
-
-First, clone the repo via git:
+Then clone the repo via git:
 
 ```bash
 $ git clone git@github.com:datopian/ckan-client-js.git
@@ -57,108 +42,25 @@ $ cd ckan-client-js
 $ npm install
 ```
 
-It will create a directory called `ckan-client-js`.<br>
-Inside that directory, it will generate the initial project structure.
-
-```bash
-ckan-client-js
-.
-├── CHANGELOG.md
-├── CONTRIBUTING.md
-├── lib
-│   ├── file.js
-│   ├── index.js
-│   └── util
-│       ├── ckan-auth-api.js
-│       └── ckan-upload-api.js
-├── License
-├── package.json
-├── package-lock.json
-├── README.md
-├── test
-│   ├── fixtures
-│   │   └── sample.csv
-│   └── upload.test.js
-└── webpack.config.js
-```
-
-## How to use?
-
-Importing in **NodeJS**
+Now you can use the code:
 
 ```js
 const { Client } = require('./lib/index')
-const f11s = require('data.js') // This is for working with datasets
 ...
 ```
 
-Importing in **web applications**
+### Browser
+
+TODO
 
 ```js
 import { Client } from "ckanClient";
-import f11s from "data.js"  // This is for working with datasets
 ...
 ```
 
-## API
+## Examples
 
-### Setting up the Client
-
-```js
-const client = new Client(
-  'my-api-key',
-  'my-organization-id',
-  'my-dataset-id',
-  'api-url'
-)
-```
-
-### Create a dataset
-
-```js
-// create a dataset
-const dataset = await client.create({
-  name: 'market',
-})
-console.log(dataset)
-// {
-//   relationships_as_object: [],
-//   private: false,
-//   id: '03de2e7a-6e52-4410-b6b1-49491f0f4d5a',
-//   metadata_created: '2020-09-16T15:03:18.022114',
-//   metadata_modified: '2020-09-16T15:03:18.022125',
-//   creator_user_id: 'cdb427df-c1ac-4365-b33c-94ccfad55aff',
-//   type: 'dataset',
-//   resources: [],
-//   groups: [],
-//   relationships_as_subject: [],
-//   name: 'market',
-//   title: 'market',
-//   revision_id: 'cfae5ff5-9b2e-4c91-965d-c0a2c740da37'
-// }
-```
-
-### Retrieve the dataset
-
-By id
-
-```js
-const dataset = await client.retrieve('03de2e7a-6e52-4410-b6b1-49491f0f4d5a')
-```
-
-Or by the name
-
-```js
-const dataset = await client.retrieve('market')
-```
-
-### Update the dataset
-
-```js
-await client.push(dataset)
-```
-
-Example of pushing a resource and updating the dataset
+### Add a resource to a dataset and save
 
 ```js
 // pushing some resource to the dataset
@@ -170,83 +72,15 @@ dataset.resources.push({
 // then saving it, this will return a new dataset with updated fields
 const updatedDataset = await client.push(dataset)
 console.log(updatedDataset)
-// {
-//   relationships_as_object: [],
-//   private: false,
-//   id: '03de2e7a-6e52-4410-b6b1-49491f0f4d5a',
-//   metadata_created: '2020-09-16T15:03:18.022114',
-//   metadata_modified: '2020-09-16T15:07:51.299795',
-//   creator_user_id: 'cdb427df-c1ac-4365-b33c-94ccfad55aff',
-//   type: 'dataset',
-//   resources: [
-//     {
-//       hash: '',
-//       description: '',
-//       format: 'CSV',
-//       path: 'https://somecsvonline.com/somecsv.csv',
-//       package_id: '03de2e7a-6e52-4410-b6b1-49491f0f4d5a',
-//       created: '2020-09-16T15:07:51.315447',
-//       revision_id: '60460e2f-c22b-4107-bee2-ccb21c849054',
-//       id: '9f01b4a5-9592-4528-b135-5c0ddd43720c',
-//       bytes: 12
-//     }
-//   ],
-//   groups: [],
-//   relationships_as_subject: [],
-//   name: 'market',
-//   title: 'market',
-//   revision_id: 'cfae5ff5-9b2e-4c91-965d-c0a2c740da37'
-// }
 ```
 
-### Advanced actions
-
-If you want to make more advanced requests to CKAN API, then you can use `action()` method. Please note that it accepts CKAN dataset and returns CKAN dataset. If you want to have frictionless data you have to use [CKAN<=>Frictionless Mapper](https://github.com/datopian/frictionless-ckan-mapper-js)
+### Upload resource data and save resource
 
 ```js
-// Update the the dataset name
-const response = await client.action('package_update', {
-  id: '03de2e7a-6e52-4410-b6b1-49491f0f4d5a',
-  title: 'New title',
-})
-console.log(response.result)
-// {
-//   license_title: null,
-//   maintainer: null,
-//   relationships_as_object: [],
-//   private: false,
-//   maintainer_email: null,
-//   num_tags: 0,
-//   id: '03de2e7a-6e52-4410-b6b1-49491f0f4d5a',
-//   metadata_created: '2020-09-16T15:03:18.022114',
-//   metadata_modified: '2020-09-16T15:16:17.696326',
-//   author: null,
-//   author_email: null,
-//   state: 'active',
-//   version: null,
-//   creator_user_id: 'cdb427df-c1ac-4365-b33c-94ccfad55aff',
-//   type: 'dataset',
-//   resources: [],
-//   num_resources: 0,
-//   tags: [],
-//   groups: [],
-//   license_id: null,
-//   relationships_as_subject: [],
-//   organization: null,
-//   name: 'market',
-//   isopen: false,
-//   url: null,
-//   notes: null,
-//   owner_org: null,
-//   extras: [],
-//   title: 'New Title',
-//   revision_id: '2b3fc86b-fcc0-47cc-92f2-a6c4830638f4'
-// }
-```
+// to open a file and give a frictionless resource with stream method
+// this uses the frictionless js library https://github.com/datopian/data.js
+const f11s = require('data.js')
 
-### Uploading a resource
-
-```js
 // If it is in Browser you can pass an attached file
 const resource = f11s.open('path/to/example.csv')
 
@@ -257,6 +91,7 @@ client.pushBlob(resource)
 //   console.log(progress)
 // })
 
+// create a dataset, add resource metadata and save
 const dataset = await client.create({
   name: 'dataset-name',
 })
@@ -265,7 +100,70 @@ dataset.resources.push(resource.descriptor)
 const updatedDataset = await client.push(dataset)
 ```
 
-## Build
+
+## API
+
+### `Client`
+
+```js
+const client = new Client(
+  'my-api-key',
+  'my-organization-id',
+  'my-dataset-id',
+  'api-url'
+)
+```
+
+### `create`
+
+Create a dataset
+
+```js
+const dataset = await client.create({
+  name: 'market',
+})
+console.log(dataset)
+```
+
+### `retrieve`
+
+By id or by name
+
+```js
+const dataset = await client.retrieve('03de2e7a-6e52-4410-b6b1-49491f0f4d5a')
+const dataset = await client.retrieve('market')
+```
+
+### `push`
+
+```js
+await client.push(dataset)
+```
+
+### `pushBlob`
+
+TODO
+
+### `action`
+
+`action` gives you direct access to the [CKAN Action API][ckan-api].
+
+Note: it uses the CKAN dataset and resource formats rather than [Frictionless][f11s]. If you want to have frictionless data you have to use [CKAN<=>Frictionless Mapper][c2f].
+
+[ckan-api]: https://docs.ckan.org/en/2.8/api/
+
+```js
+// Update the the dataset name
+const response = await client.action('package_update', {
+  id: '03de2e7a-6e52-4410-b6b1-49491f0f4d5a',
+  title: 'New title',
+})
+console.log(response.result)
+```
+
+## Developers
+
+### Build
 
 This command will create a bundle in `dist`
 
@@ -273,7 +171,7 @@ This command will create a bundle in `dist`
 npm run build
 ```
 
-## Tests
+### Tests
 
 ```bash
 $ npm test
@@ -290,10 +188,6 @@ watch the test
 ```bash
 $ npm run test:watch
 ```
-
-## Changelog
-
-Detailed changes for each release are documented in [CHANGELOG.md](CHANGELOG.md).
 
 ## Contributing
 
