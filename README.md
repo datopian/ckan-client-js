@@ -29,33 +29,45 @@ Prerequisites
 Then clone the repo via git:
 
 ```bash
-$ git clone git@github.com:datopian/ckan-client-js.git
+$ npm install https://github.com/datopian/ckan-client-js.git
 ```
 
-And then install dependencies with npm.
+or
 
 ```bash
-$ cd ckan-client-js
-```
-
-```bash
-$ npm install
+$ yarn add https://github.com/datopian/ckan-client-js.git
 ```
 
 Now you can use the code:
 
 ```js
-const { Client } = require('./lib/index')
+const { Client } = require('ckanClient')
 ...
 ```
 
 ### Browser
 
-TODO
+If you want to use it as a script in the browser, then follow the steps below:
 
-```js
-import { Client } from "ckanClient";
-...
+```bash
+$ git clone git@github.com:datopian/ckan-client-js.git
+$ cd ckan-client-js
+$ npm install
+$ npm build
+```
+
+The last command will create `/dist/index.js` bundle which can be used in the browser like:
+
+```html
+<head>
+  <script src="./ckan-client-js/dist/index.js"></script>
+  <script>
+    // Global ckanClient variable is available here...
+    const { Client } = ckanClient;
+    ...
+  </script>
+</head>
+<body></body>
 ```
 
 ## Examples
@@ -84,7 +96,7 @@ const f11s = require('data.js')
 // If it is in Browser you can pass an attached file
 const resource = f11s.open('path/to/example.csv')
 
-client.pushBlob(resource)
+await client.pushBlob(resource)
 // If you are in browser you can also track the progress, in the second argument
 // client.pushBlob(resource, (progressEvent) => {
 //   let progress = (progressEvent.loaded / progressEvent.total) * 100
@@ -100,66 +112,9 @@ dataset.resources.push(resource.descriptor)
 const updatedDataset = await client.push(dataset)
 ```
 
-
 ## API
 
-### `Client`
-
-```js
-const client = new Client(
-  'my-api-key',
-  'my-organization-id',
-  'my-dataset-id',
-  'api-url'
-)
-```
-
-### `create`
-
-Create a dataset
-
-```js
-const dataset = await client.create({
-  name: 'market',
-})
-console.log(dataset)
-```
-
-### `retrieve`
-
-By id or by name
-
-```js
-const dataset = await client.retrieve('03de2e7a-6e52-4410-b6b1-49491f0f4d5a')
-const dataset = await client.retrieve('market')
-```
-
-### `push`
-
-```js
-await client.push(dataset)
-```
-
-### `pushBlob`
-
-TODO
-
-### `action`
-
-`action` gives you direct access to the [CKAN Action API][ckan-api].
-
-Note: it uses the CKAN dataset and resource formats rather than [Frictionless][f11s]. If you want to have frictionless data you have to use [CKAN<=>Frictionless Mapper][c2f].
-
-[ckan-api]: https://docs.ckan.org/en/2.8/api/
-
-```js
-// Update the the dataset name
-const response = await client.action('package_update', {
-  id: '03de2e7a-6e52-4410-b6b1-49491f0f4d5a',
-  title: 'New title',
-})
-console.log(response.result)
-```
+See API documentation [here](./docs/API.md)
 
 ## Developers
 
@@ -188,6 +143,18 @@ watch the test
 ```bash
 $ npm run test:watch
 ```
+
+### Documentation
+
+We use JSDoc to document the methods we are creating. Those JSDoc comments are being used to generate API docs for README via [jsdoc2md](https://github.com/jsdoc2md/jsdoc-to-markdown).
+
+To generate API markdown docs from JSDoc comments run:
+
+```bash
+$ npx jsdoc2md example.js
+```
+
+Where `example.js` is the file where you have implemented new methods. Paste the output in [API docs](./docs/API.md). Make sure you paste only your changes.
 
 ## Contributing
 
