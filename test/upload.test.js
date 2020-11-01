@@ -141,7 +141,7 @@ test('Can instantiate Uploader', (t) => {
 })
 
 test('Can get JWT token', async (t) => {
-  const token = await client.doBlobAuthz()
+  const token = await client.getUploadAuthToken()
 
   t.is(ckanAuthzMock.isDone(), true)
   t.is(token, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZXMiOiIiLCJ== ')
