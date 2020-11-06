@@ -1,6 +1,6 @@
 const test = require('ava')
 const nock = require('nock')
-const f11s = require('data.js')
+const f11s = require('frictionless.js')
 
 const { Client, Open } = require('../lib/index')
 
