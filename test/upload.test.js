@@ -23,16 +23,16 @@ const ckanAuthzConfig = {
 
 const accessGranterConfig = {
   body: {
-    operation: 'upload',
-    transfers: ['multipart-basic', 'basic'],
-    ref: { name: 'refs/heads/master' },
-    objects: [
-      {
-        oid: "7b28186dca74020a82ed969101ff551f97aed110d8737cea4763ce5be3a38b47",
-        size: 701,
-      },
-    ],
-  },
+      operation: 'upload',
+      transfers: [ 'multipart-basic', 'basic' ],
+      ref: { name: 'refs/heads/master' },
+      objects: [
+        {
+          oid: '7b28186dca74020a82ed969101ff551f97aed110d8737cea4763ce5be3a38b47',
+          size: 701
+        }
+      ]
+    },
   headers: {
     Accept: 'application/vnd.git-lfs+json',
     'Content-Type': 'application/vnd.git-lfs+json',
@@ -127,6 +127,18 @@ const verifyFileUploadMock = nock('https://some-verify-callback.com')
     success: true,
   })
 
+const doUploadMock = nock('https://myaccount.blob.core.windows.net')
+  .persist()
+  .put('/mycontainer/my-blob', {
+    path: 'test/fixtures/sample.csv',
+    pathType: 'local',
+    name: 'sample',
+    format: 'csv',
+    mediatype: 'text/csv',
+    encoding: 'UTF-8'
+  })
+  .reply(200, {})
+
 /**
  * Start test
  */
@@ -153,8 +165,9 @@ test('Push works with packaged dataset', async (t) => {
   const resource = f11s.open(path)
   await client.pushBlob(resource)
 
+  t.is(ckanAuthzMock.isDone(), true)
   t.is(mainAuthzMock_forCloudStorageAccessGranterServiceMock.isDone(), true)
-  t.is(cloudStorageMock.isDone(), true)
+  t.is(doUploadMock.isDone(), true)
   t.is(verifyFileUploadMock.isDone(), true)
 })
 
