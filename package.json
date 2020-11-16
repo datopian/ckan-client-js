@@ -40,7 +40,7 @@
     "@babel/preset-env": "^7.9.5",
     "ava": "^3.5.2",
     "babel-loader": "^8.1.0",
-    "data.js": "git+https://github.com/datopian/data.js.git",
+    "frictionless.js": "git+https://github.com/frictionlessdata/frictionless-js.git",
     "jsdoc-to-markdown": "^6.0.1",
     "nock": "^12.0.3",
     "webpack": "^4.42.1",
