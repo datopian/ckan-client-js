@@ -2,7 +2,7 @@ const test = require('ava')
 const nock = require('nock')
 const f11s = require('data.js')
 
-const { Client, Open } = require('../lib/index')
+const { Client } = require('../lib/index')
 
 /**
  * Push stuff
@@ -24,10 +24,11 @@ const ckanAuthzConfig = {
 const accessGranterConfig = {
   body: {
     operation: 'upload',
-    transfers: ['basic'],
-    ref: { name: 'refs/heads/contrib' },
+    transfers: ['multipart-basic', 'basic'],
+    ref: { name: 'refs/heads/master' },
     objects: [
       {
+        oid: "7b28186dca74020a82ed969101ff551f97aed110d8737cea4763ce5be3a38b47",
         size: 701,
       },
     ],
@@ -57,7 +58,7 @@ const client = new Client(
   config.lfs
 )
 
-const file = new Open.NodeFileSystemFile('./test/fixtures/sample.csv')
+const file = f11s.open('./test/fixtures/sample.csv')
 
 /**
  * Mock
@@ -158,8 +159,8 @@ test('Push works with packaged dataset', async (t) => {
 })
 
 test('Dataset not altered', async (t) => {
-  const size = await file.size()
-  const sha256 = await file.sha256()
+  const size = await file.size
+  const sha256 = await file.hash('sha256')
 
   t.is(size, 701)
   t.is(

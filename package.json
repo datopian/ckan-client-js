@@ -1,6 +1,6 @@
 {
-  "name": "ckanClient",
-  "version": "0.2.0",
+  "name": "ckan-client",
+  "version": "0.3.0",
   "description": "ckan-client-js is a SDK in javascript for uploading files and updating metastore",
   "main": "lib/index.js",
   "directories": {
@@ -29,7 +29,8 @@
   "dependencies": {
     "axios": "^0.19.2",
     "crypto-js": "^4.0.0",
-    "frictionless-ckan-mapper-js": "^1.0.0"
+    "frictionless-ckan-mapper-js": "^1.0.0",
+    "frictionless.js": "^0.13.3"
   },
   "devDependencies": {
     "@babel/cli": "^7.8.4",
