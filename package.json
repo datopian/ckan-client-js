@@ -1,6 +1,6 @@
 {
   "name": "ckan-client",
-  "version": "0.3.1",
+  "version": "0.4.1",
   "description": "ckan-client-js is a SDK in javascript for uploading files and updating metastore",
   "main": "lib/index.js",
   "directories": {
