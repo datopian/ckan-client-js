@@ -53,7 +53,7 @@ If you want to use it as a script in the browser, then follow the steps below:
 $ git clone git@github.com:datopian/ckan-client-js.git
 $ cd ckan-client-js
 $ npm install
-$ npm build
+$ npm run build
 ```
 
 The last command will create `/dist/index.js` bundle which can be used in the browser like:
