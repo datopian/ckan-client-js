@@ -1,12 +1,12 @@
 <div align="center">
 
-# CKAN Javascript Client
+# CKAN Client: Javascript SDK
 
 [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/datopian/ckan-client-js/issues)
 [![build](https://github.com/datopian/ckan-client-js/workflows/ckan-client-js%20actions/badge.svg)](https://github.com/datopian/ckan-client-js/actions)
 [![The MIT License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](http://opensource.org/licenses/MIT)
 
-`ckan-client-js` is a Javascript client "SDK" for interacting with the CKAN data management system (DMS). It covers the whole action API as well as convenience methods for uploading files, updating the metastore etc.
+CKAN SDK for interacting with CKAN instances with [CKAN v3 style cloud storage][storage]. It covers the whole action API as well as convenience methods for uploading files, updating the metastore etc. Tutorial on use at https://tech.datopian.com/ckan-client-guide/. API documentation below. 
 
 </div>
 
