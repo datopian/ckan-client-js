@@ -27,7 +27,7 @@
   "author": "datopian",
   "license": "MIT",
   "dependencies": {
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "crypto-js": "^4.0.0",
     "frictionless-ckan-mapper-js": "^1.0.0",
     "frictionless.js": "^0.13.3"
