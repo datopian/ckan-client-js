@@ -10,6 +10,8 @@ CKAN SDK for interacting with CKAN instances with [CKAN v3 style cloud storage][
 
 </div>
 
+[storage]: https://tech.datopian.com/blob-storage/#ckan-v3
+
 ## Frictionless Formats
 
 The client uses [Frictionless formats][f11s] by default for describing dataset and resource objects passed to client methods. Internally we then use the [CKAN<=>Frictionless Mapper][c2f] to convert to CKAN formats before calling the API. Thus, you can use Frictionless Formats by default with the client. (As CKAN moves to Frictionless to default this will gradually become unnecessary).
